@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "unstruwwel"
+version = "0.2.0"
+description = "Detect and Parse Historic Dates in R"
+authors = ["Your Name <you@example.com>"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
