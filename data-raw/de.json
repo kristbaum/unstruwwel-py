@@ -1,0 +1,208 @@
+{
+    "name": "de",
+    "date_order": "DMY",
+    "winter": [
+        "winter"
+    ],
+    "spring": [
+        "frühling"
+    ],
+    "summer": [
+        "sommer"
+    ],
+    "autumn": [
+        "herbst"
+    ],
+    "january": [
+        "januar",
+        "jan"
+    ],
+    "february": [
+        "februar",
+        "feb"
+    ],
+    "march": [
+        "märz",
+        "mär"
+    ],
+    "april": [
+    	"april",
+        "apr"
+    ],
+    "may": [
+        "mai"
+    ],
+    "june": [
+        "juni",
+        "jun"
+    ],
+    "july": [
+        "juli",
+        "jul"
+    ],
+    "august": [
+    	"august",
+        "aug"
+    ],
+    "september": [
+    	"september",
+        "sep"
+    ],
+    "october": [
+        "oktober",
+        "okt"
+    ],
+    "november": [
+    	"november",
+        "nov"
+    ],
+    "december": [
+        "dezember",
+        "dez"
+    ],
+    "monday": [
+        "montag",
+        "mo"
+    ],
+    "tuesday": [
+        "dienstag",
+        "di"
+    ],
+    "wednesday": [
+        "mittwoch",
+        "mi"
+    ],
+    "thursday": [
+        "donnerstag",
+        "do"
+    ],
+    "friday": [
+        "freitag",
+        "fr"
+    ],
+    "saturday": [
+        "samstag",
+        "sa"
+    ],
+    "sunday": [
+        "sonntag",
+        "so"
+    ],
+    "year": [
+        "jahr",
+        "jahre",
+        "jahren"
+    ],
+    "month": [
+        "monat",
+        "monate",
+        "monaten"
+    ],
+    "week": [
+        "woche",
+        "wochen"
+    ],
+    "day": [
+        "tag",
+        "tage"
+    ],
+    "uncertain": [
+    	"vermutlich",
+    	"vmtl",
+        "etwa",
+        "wohl"
+    ],
+    "approximate": [
+        "gegen",
+        "circa",
+        "ca",
+        "um"
+    ],
+    "between": [
+    	"zwischen"
+    ],
+    "and": [
+    	"und",
+        "-"
+    ],
+    "or": [
+    	"oder"
+   	],
+    "not": [
+    	"nicht"
+    ],
+    "s": [
+    	"er"
+    ],
+    "before": [
+        "spätestens",
+        "bis",
+        "vor"
+    ],
+    "after": [
+        "frühestens",
+    	"nach",
+    	"seit",
+    	"ab"
+    ],
+    "early": [
+    	"anfang",
+    	"frühes",
+    	"eingang"
+    ],
+    "mid": [
+    	"mitte"
+    ],
+    "late": [
+    	"ende",
+    	"spätes",
+    	"ausgang"
+    ],
+    "half": [
+    	"semester",
+        "hälfte"
+    ],
+    "third": [
+        "drittel"
+    ],
+    "quarter": [
+    	"viertel"
+    ],
+    "last": [
+    	"letztes",
+        "letztem",
+        "letzten"
+    ],
+    "century": [
+    	"jahrhunderts",
+    	"jahrhundert",
+    	"jahrh",
+    	"jh"
+    ],
+    "bc": [
+    	"vor christi",
+    	"v christi",
+    	"v chr"
+    ],
+    "stop_words": [
+    	"dem",
+    	"der",
+    	"das",
+    	"die",
+        "des"
+    ],
+    "simplifications": {        
+    	"erstes": "1",
+    	"zweites": "2",
+    	"drittes": "3",
+        "viertes": "4",
+        "fünftes": "5",
+        "sechstes": "6",
+        "siebtes": "7",
+        "achtes": "8",
+        "neuntes": "9",
+        "zehntes": "10",
+        "elftes": "11",
+        "zwölftes": "12"
+    }
+}

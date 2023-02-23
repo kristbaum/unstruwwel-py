@@ -1,0 +1,174 @@
+{
+    "name": "fr",
+    "date_order": "DMY",
+    "winter": [
+        "hiver"
+    ],
+    "spring": [
+        "printemps"
+    ],
+    "summer": [
+        "été"
+    ],
+    "autumn": [
+        "automne"
+    ],
+    "january": [
+        "janvier",
+        "jan"
+    ],
+    "february": [
+        "février",
+        "fév"
+    ],
+    "march": [
+        "mars"
+    ],
+    "april": [
+        "avril",
+        "avr"
+    ],
+    "may": [
+        "mai"
+    ],
+    "june": [
+        "juin",
+        "jun"
+    ],
+    "july": [
+        "juillet",
+        "jul"
+    ],
+    "august": [
+        "août",
+        "aoû"
+    ],
+    "september": [
+        "septembre",
+        "sep"
+    ],
+    "october": [
+        "octobre",
+        "oct"
+    ],
+    "november": [
+        "novembre",
+        "nov"
+    ],
+    "december": [
+        "décembre",
+        "déc"
+    ],
+    "monday": [
+        "lundi",
+        "lun",
+        "lu"
+    ],
+    "tuesday": [
+        "mardi",
+        "mar",
+        "ma"
+    ],
+    "wednesday": [
+        "mercredi",
+        "mer",
+        "me"
+    ],
+    "thursday": [
+        "jeudi",
+        "jeu",
+        "je"
+    ],
+    "friday": [
+        "vendredi",
+        "ven",
+        "ve"
+    ],
+    "saturday": [
+        "samedi",
+        "sam",
+        "sa"
+    ],
+    "sunday": [
+        "dimanche",
+        "dim",
+        "di"
+    ],
+    "year": [
+        "année",
+        "années"
+    ],
+    "month": [
+        "mois"
+    ],
+    "week": [
+        "semaine",
+        "semaines"
+    ],
+    "day": [
+        "jour",
+        "jours"
+    ],
+    "circa": [
+        "vers"
+    ],
+    "between": [
+        "entre"
+    ],
+    "and": [
+        "et",
+        "-"
+    ],
+    "or": [
+        "ou"
+    ],
+    "not": [
+        "non"
+    ],
+    "before": [
+        "avant"
+    ],
+    "after": [
+        "après"
+    ],
+    "half": [
+        "moitié"
+    ],
+    "third": [
+        "tiers"
+    ],
+    "quarter": [
+        "quart"
+    ],
+    "last": [
+        "dernier"
+    ],
+    "century": [
+        "siècle"
+    ],
+    "bc": [
+        "av j-c",
+        "av jc"
+    ],
+    "stop_words": [
+        "ère",
+        "le",
+        "er",
+        "en",
+        "e"
+    ],
+    "simplifications": {
+        "premier": "1",
+        "deuxième": "2",
+        "troisième": "3",
+        "quatrième": "4",
+        "cinquième": "5",
+        "sixième": "6",
+        "septième": "7",
+        "huitième": "8",
+        "neuvième": "9",
+        "dixième": "10",
+        "Onzième": "11",
+        "douzième": "12"
+    }
+}
