@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from Python.accessors_period import Periods
+from unstruwwel.period import Periods
 
 
 class Century(Periods):
@@ -43,4 +43,5 @@ class Century(Periods):
             new_end_date = end_date
         return (new_start_date, new_end_date)
 
-    # Additional methods as needed
+    def time_span(self):
+        return (self._interval[0].year, self._interval[1].year)

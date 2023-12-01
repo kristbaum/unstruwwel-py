@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+
 def is_valid_language(x, languages):
     return all(lang in languages for lang in x)
 
@@ -30,3 +33,8 @@ def is_number(x):
 
 def get_item(x, n=1):
     return x[n-1]
+
+def generate_date_range(start, end):
+    start_date = datetime.strptime(start, '%Y-%m-%d')
+    end_date = datetime.strptime(end, '%Y-%m-%d')
+    return [(start_date + timedelta(days=x)).strftime('%Y-%m-%d') for x in range((end_date - start_date).days + 1)]
