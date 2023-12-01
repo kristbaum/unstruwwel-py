@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 
-class Periods:
+class Period:
     def __init__(self, *args):
         # Assuming args can include intervals, numbers, or Periods objects
         self._interval = None
@@ -12,7 +12,7 @@ class Periods:
         fuzzy_flags = []
 
         for arg in args:
-            if isinstance(arg, Periods):
+            if isinstance(arg, Period):
                 intervals.append(arg._interval)
                 fuzzy_flags.append(arg.fuzzy)
             elif isinstance(
@@ -164,7 +164,7 @@ class Periods:
                 pass
 
             # Create and return a new Periods object with adjusted interval
-            return Periods(
+            return Period(
                 self._interval
             )  # Assuming _interval is adjusted by this method
         except Exception as e:
