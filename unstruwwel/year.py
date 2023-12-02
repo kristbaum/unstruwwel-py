@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 import calendar
 
-from Python.accessors_period import Periods
+from unstruwwel.period import Period
 
-class Year(Periods):
+
+class Year(Period):
     def __init__(self, value):
         super().__init__()
         self.value = int(value)
@@ -60,4 +61,3 @@ class Year(Periods):
                 return self
             else:
                 raise e
-
