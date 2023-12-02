@@ -1,12 +1,29 @@
 from datetime import datetime, timedelta
 
-from unstruwwel.period import Periods
+from unstruwwel.period import Period
 
 
-class Century(Periods):
+class Century(Period):
     def __init__(self, value):
         super().__init__()
-        value = int(value)
+
+        if isinstance(value, str):
+            value = int(value)
+
+        # Ensure value is an integer or a float that represents an integer
+        if not isinstance(value, int):
+            if isinstance(value, float) and value.is_integer():
+                value = int(value)
+            else:
+                raise ValueError(
+                    "Value must be an integer or a float that represents an integer."
+                )
+
+        if not (1 <= abs(value) < 22):
+            raise ValueError(
+                "Value must be between 1 and 21, inclusive, or its negative counterpart."
+            )
+
         if value < 0:
             start_year = 1 - (abs(value + 1) * 100)
             end_year = start_year + 100
