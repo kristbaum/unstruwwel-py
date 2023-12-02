@@ -1,6 +1,6 @@
 import unittest
 
-import unstruwwel
+from unstruwwel.unstruwwel import unstruwwel
 
 
 class TestUnstruwwel(unittest.TestCase):
