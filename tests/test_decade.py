@@ -52,19 +52,19 @@ class TestDecade(unittest.TestCase):
 
         # Early part of the 1970s
         self.assertEqual(
-            Decade(1970).take(type="early")._interval,
+            Decade(1970).take(modifier="early")._interval,
             (datetime(1970, 1, 1), datetime(1972, 1, 1) - timedelta(days=1)),
         )
 
         # Late part of the 1970s
         self.assertEqual(
-            Decade(1970).take(type="late")._interval,
+            Decade(1970).take(modifier="late")._interval,
             (datetime(1978, 1, 1), datetime(1980, 1, 1) - timedelta(days=1)),
         )
 
         # Middle of the 1970s
         self.assertEqual(
-            Decade(1970).take(type="mid")._interval,
+            Decade(1970).take(modifier="mid")._interval,
             (datetime(1974, 1, 1), datetime(1976, 1, 1) - timedelta(days=1)),
         )
 
@@ -103,19 +103,19 @@ class TestDecade(unittest.TestCase):
 
         # Early part of the 1970s BC
         self.assertEqual(
-            Decade(-1970).take(type="early")._interval,
+            Decade(-1970).take(modifier="early")._interval,
             (datetime(-1971, 12, 31), datetime(-1970, 1, 1)),
         )
 
         # Late part of the 1970s BC
         self.assertEqual(
-            Decade(-1970).take(type="late")._interval,
+            Decade(-1970).take(modifier="late")._interval,
             (datetime(-1979, 12, 31), datetime(-1978, 1, 1)),
         )
 
         # Middle of the 1970s BC
         self.assertEqual(
-            Decade(-1970).take(type="mid")._interval,
+            Decade(-1970).take(modifier="mid")._interval,
             (datetime(-1975, 12, 31), datetime(-1974, 1, 1)),
         )
 
@@ -135,7 +135,7 @@ class TestDecade(unittest.TestCase):
             decade.take(99)
 
         with self.assertRaises(ValueError):
-            decade.take(type="abc")
+            decade.take(modifier="abc")
 
         with self.assertRaises(ValueError):
             decade.take(3, "half")
@@ -169,7 +169,7 @@ class TestDecade(unittest.TestCase):
             decade.take(5, "quarter", ignore_errors=True)._interval, expected_interval
         )
         self.assertEqual(
-            decade.take(type="abc", ignore_errors=True)._interval, expected_interval
+            decade.take(modifier="abc", ignore_errors=True)._interval, expected_interval
         )
 
 

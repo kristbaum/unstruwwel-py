@@ -113,7 +113,7 @@ class Period:
             new_end_date = start_date + timedelta(days=x * step * 365.25 - 1)
             # special case for third part of century
             if step == 33 and x == 3:
-                new_end_date = start_date + timedelta(days=(100 * 365.25) - 2)  
+                new_end_date = start_date + timedelta(days=(100 * 365.25) - 2)
 
         self._interval = (new_start_date, new_end_date)
 
@@ -224,13 +224,13 @@ class Period:
 
         return self
 
-    def take(self, x=None, type=None, ignore_errors=False):
+    def take(self, x=None, modifier=None, ignore_errors=False):
         """
         Adjusts the time period based on the specified parameters.
 
         Args:
             x (int or str): The value specifying the period.
-            type (str): The type of period (early, mid, late, quarter, third, half).
+            modifier (str): The type of period (early, mid, late, quarter, third, half).
             ignore_errors (bool): Whether to ignore errors and return the original Period object.
 
         Returns:
@@ -242,24 +242,38 @@ class Period:
         """
         try:
             # Ensure type is a string or None
-            if type is not None:
-                type = str(type).lower()
+            if modifier is not None:
+                modifier = str(modifier).lower()
 
-            if type in ["early", "mid", "late"]:
-                method_name = f"_take_{type}"
+            if modifier in ["early", "mid", "late"]:
+                method_name = f"_take_{modifier}"
                 if hasattr(self, method_name):
                     self._interval = getattr(self, method_name)()
                 else:
-                    raise ValueError(f"Unsupported type: {type}")
-            elif type in ["quarter", "third", "half"]:
-                self._take_period(x, type)
+                    raise ValueError(f"Unsupported type: {modifier}")
+            elif modifier in ["quarter", "third", "half"]:
+                self._take_period(x, modifier)
             else:
                 # Handle cases where type is None or x defines a year or decade
                 if x is not None:
-                    print("x is a number")
-                    # Placeholder for logic to handle numerical value of x
-                    # This part needs to be implemented based on specific requirements
-                    pass
+                    if type(self).__name__ == "Decade":
+                        # For decades, x would represent a specific year in the decade
+                        year_within_decade = self._interval[0].year + x - 1
+                        self._interval = (
+                            date(year_within_decade, 1, 1),
+                            date(year_within_decade + 1, 1, 1) - timedelta(days=1),
+                        )
+                    elif type(self).__name__  == "Century":
+                        # For centuries, x could represent a specific portion, like a decade
+                        decade_within_century = self._interval[0].year + (x - 1) * 10
+                        self._interval = (
+                            date(decade_within_century, 1, 1),
+                            date(decade_within_century + 10, 1, 1) - timedelta(days=1),
+                        )
+                    else:
+                        raise ValueError(
+                            "Unsupported numerical value for x with the given period type."
+                        )
 
             # Create and return a new Periods object with adjusted interval
             return Period(self._interval)

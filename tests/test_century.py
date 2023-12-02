@@ -44,19 +44,19 @@ class TestCentury(unittest.TestCase):
 
         # Early part of the 15th century
         self.assertEqual(
-            Century(15).take(type="early")._interval,
+            Century(15).take(modifier="early")._interval,
             (date(1401, 1, 1), date(1415, 12, 31)),
         )
 
         # Late part of the 15th century
         self.assertEqual(
-            Century(15).take(type="late")._interval,
+            Century(15).take(modifier="late")._interval,
             (date(1486, 1, 1), date(1500, 12, 31)),
         )
 
         # Middle of the 15th century
         self.assertEqual(
-            Century(15).take(type="mid")._interval,
+            Century(15).take(modifier="mid")._interval,
             (date(1446, 1, 1), date(1455, 12, 31)),
         )
 
@@ -112,19 +112,19 @@ class TestCentury(unittest.TestCase):
 
         # Early part of the 15th century BC
         self.assertEqual(
-            Century(-15).take(type="early")._interval,
+            Century(-15).take(modifier="early")._interval,
             (date(-1415, 12, 31), date(-1401, 1, 1)),
         )
 
         # Late part of the 15th century BC
         self.assertEqual(
-            Century(-15).take(type="late")._interval,
+            Century(-15).take(modifier="late")._interval,
             (date(-1500, 12, 31), date(-1486, 1, 1)),
         )
 
         # Middle of the 15th century BC
         self.assertEqual(
-            Century(-15).take(type="mid")._interval,
+            Century(-15).take(modifier="mid")._interval,
             (date(-1455, 12, 31), date(-1446, 1, 1)),
         )
 
@@ -144,16 +144,16 @@ class TestCentury(unittest.TestCase):
             century.take(999)
 
         with self.assertRaises(ValueError):
-            century.take(type="abc")
+            century.take(modifier="abc")
 
         with self.assertRaises(ValueError):
-            century.take(3, type="half")
+            century.take(3, modifier="half")
 
         with self.assertRaises(ValueError):
-            century.take(4, type="third")
+            century.take(4, modifier="third")
 
         with self.assertRaises(ValueError):
-            century.take(5, type="quarter")
+            century.take(5, modifier="quarter")
 
     def test_invalid_take_without_errors(self):
         """
@@ -175,7 +175,7 @@ class TestCentury(unittest.TestCase):
             century.take(5, "quarter", ignore_errors=True)._interval, expected_interval
         )
         self.assertEqual(
-            century.take(type="abc", ignore_errors=True)._interval, expected_interval
+            century.take(modifier="abc", ignore_errors=True)._interval, expected_interval
         )
 
 
