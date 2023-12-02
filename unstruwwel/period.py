@@ -114,6 +114,8 @@ class Period:
             # special case for third part of century
             if step == 33 and x == 3:
                 new_end_date = start_date + timedelta(days=(100 * 365.25) - 2)
+            elif step == 50 and x == 2:
+                new_end_date = new_end_date - timedelta(days=1)
 
         self._interval = (new_start_date, new_end_date)
 
