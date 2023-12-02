@@ -2,6 +2,28 @@ from datetime import datetime, timedelta
 
 
 class Period:
+    """
+    Represents a time period with start and end dates.
+
+    Args:
+        *args: Variable length arguments that can include intervals, numbers, or Period objects.
+
+    Attributes:
+        _interval (tuple): The combined interval of the time period.
+        fuzzy (int): The fuzzy flag indicating the level of uncertainty (-1 for approximate, 0 for exact, 1 for uncertain).
+        express (int): The express flag indicating the position of the time period relative to other time periods (-1 for before, 0 for within, 1 for after).
+
+    Properties:
+        interval (tuple): The standardized interval format of the time period.
+        time_span (list): The start and end years of the time period.
+        iso_format (str): The ISO 8601 formatted string representation of the time period.
+
+    Methods:
+        set_additions(additions): Sets additional flags for the time period.
+        take(x, type, ignore_errors): Adjusts the time period based on the specified parameters.
+
+    """
+
     def __init__(self, *args):
         # Assuming args can include intervals, numbers, or Periods objects
         self._interval = None
@@ -35,6 +57,16 @@ class Period:
                 self.fuzzy = 1
 
     def _combine_intervals(self, intervals):
+        """
+        Combines multiple intervals into a single interval.
+
+        Args:
+            intervals (list): List of intervals to be combined.
+
+        Returns:
+            tuple: The combined interval.
+
+        """
         # Initialize with extreme dates
         earliest_start = datetime.max
         latest_end = datetime.min
@@ -52,6 +84,17 @@ class Period:
         return (earliest_start, latest_end)
 
     def _take_period(self, x, type):
+        """
+        Adjusts the time period based on the specified period type and value.
+
+        Args:
+            x (int or str): The value specifying the period.
+            type (str): The type of period (quarter, third, half).
+
+        Raises:
+            ValueError: If the value of x is invalid for the specified type.
+
+        """
         max_value = {"quarter": 4, "third": 3, "half": 2}.get(type, 10)
 
         if x == "last":
@@ -76,6 +119,13 @@ class Period:
 
     @property
     def interval(self):
+        """
+        Gets the standardized interval format of the time period.
+
+        Returns:
+            tuple: The standardized interval format.
+
+        """
         if self._interval is None:
             return None
 
@@ -98,6 +148,13 @@ class Period:
 
     @property
     def time_span(self):
+        """
+        Gets the start and end years of the time period.
+
+        Returns:
+            list: The start and end years.
+
+        """
         if self._interval is None:
             return None
 
@@ -114,6 +171,13 @@ class Period:
 
     @property
     def iso_format(self):
+        """
+        Gets the ISO 8601 formatted string representation of the time period.
+
+        Returns:
+            str: The ISO 8601 formatted string.
+
+        """
         if self._interval is None:
             return None
 
@@ -138,6 +202,16 @@ class Period:
         return iso_string
 
     def set_additions(self, additions):
+        """
+        Sets additional flags for the time period.
+
+        Args:
+            additions (list): List of additional flags.
+
+        Returns:
+            Period: The updated Period object.
+
+        """
         if "approximate" in additions or "?" in additions:
             self.fuzzy = -1
         if "uncertain" in additions:
@@ -151,6 +225,21 @@ class Period:
         return self
 
     def take(self, x=None, type=None, ignore_errors=False):
+        """
+        Adjusts the time period based on the specified parameters.
+
+        Args:
+            x (int or str): The value specifying the period.
+            type (str): The type of period (early, mid, late, quarter, third, half).
+            ignore_errors (bool): Whether to ignore errors and return the original Period object.
+
+        Returns:
+            Period: The adjusted Period object.
+
+        Raises:
+            ValueError: If the specified type is unsupported.
+
+        """
         try:
             # Ensure type is a string or None
             if type is not None:

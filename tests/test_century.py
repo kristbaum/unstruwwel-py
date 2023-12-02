@@ -5,7 +5,14 @@ from unstruwwel.century import Century
 
 
 class TestCentury(unittest.TestCase):
+    """
+    A test case class for the Century class.
+    """
+
     def test_invalid_century(self):
+        """
+        Test case for invalid century inputs.
+        """
         with self.assertRaises(ValueError):
             Century(22)
         with self.assertRaises(ValueError):
@@ -14,6 +21,9 @@ class TestCentury(unittest.TestCase):
             Century([10, 20])
 
     def test_positive_century_with_take(self):
+        """
+        Test case for positive century inputs with take() method.
+        """
         # First half of the 15th century
         self.assertEqual(
             Century(15).take(1, "half")._interval,
@@ -63,6 +73,9 @@ class TestCentury(unittest.TestCase):
         )
 
     def test_negative_century(self):
+        """
+        Test case for negative century inputs.
+        """
         # Test for the 1st century BC
         self.assertEqual(
             Century("-1")._interval, (datetime(-100, 12, 31), datetime(-1, 1, 1))
@@ -76,6 +89,9 @@ class TestCentury(unittest.TestCase):
         self.assertEqual(Century(-15).time_span(), (-1500, -1401))
 
     def test_negative_century_with_take(self):
+        """
+        Test case for negative century inputs with take() method.
+        """
         # First half of the 15th century BC
         self.assertEqual(
             Century(-15).take(1, "half")._interval,
@@ -119,6 +135,9 @@ class TestCentury(unittest.TestCase):
         )
 
     def test_invalid_take_with_errors(self):
+        """
+        Test case for invalid take() inputs with errors.
+        """
         century = Century(15)
 
         with self.assertRaises(ValueError):
@@ -137,6 +156,9 @@ class TestCentury(unittest.TestCase):
             century.take(5, type="quarter")
 
     def test_invalid_take_without_errors(self):
+        """
+        Test case for invalid take() inputs without errors.
+        """
         century = Century(15)
         expected_interval = (datetime(1401, 1, 1), datetime(1500, 12, 31))
 

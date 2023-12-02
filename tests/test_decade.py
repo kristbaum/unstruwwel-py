@@ -5,7 +5,14 @@ from unstruwwel.decade import Decade
 
 
 class TestDecade(unittest.TestCase):
+    """
+    A test case class for testing the functionality of the Decade class.
+    """
+
     def test_invalid_decade(self):
+        """
+        Test case for invalid decade inputs.
+        """
         with self.assertRaises(ValueError):
             Decade(203)
         with self.assertRaises(ValueError):
@@ -16,6 +23,9 @@ class TestDecade(unittest.TestCase):
             Decade([197, 198])
 
     def test_positive_decade(self):
+        """
+        Test case for positive decades.
+        """
         # Test for the decade starting in 1770
         self.assertEqual(
             Decade(1770)._interval,
@@ -31,6 +41,9 @@ class TestDecade(unittest.TestCase):
         self.assertEqual(Decade(1950, official_def=True).time_span(), (1951, 1960))
 
     def test_positive_decade_with_take(self):
+        """
+        Test case for positive decades with take() method.
+        """
         # First half of the 1970s
         self.assertEqual(
             Decade(1970).take(1, "half")._interval,
@@ -62,6 +75,9 @@ class TestDecade(unittest.TestCase):
         )
 
     def test_negative_decade(self):
+        """
+        Test case for negative decades.
+        """
         # Decade starting in 1770 BC
         self.assertEqual(
             Decade(-1770)._interval, (datetime(-1779, 12, 31), datetime(-1770, 1, 1))
@@ -76,6 +92,9 @@ class TestDecade(unittest.TestCase):
         self.assertEqual(Decade(-1950, official_def=True).time_span(), (-1960, -1951))
 
     def test_negative_decade_with_take(self):
+        """
+        Test case for negative decades with take() method.
+        """
         # First half of the 1970s BC
         self.assertEqual(
             Decade(-1970).take(1, "half")._interval,
@@ -107,6 +126,9 @@ class TestDecade(unittest.TestCase):
         )
 
     def test_invalid_take_with_errors(self):
+        """
+        Test case for invalid take() method inputs with errors.
+        """
         decade = Decade(1970)
 
         with self.assertRaises(ValueError):
@@ -125,6 +147,9 @@ class TestDecade(unittest.TestCase):
             decade.take(5, "quarter")
 
     def test_invalid_take_without_errors(self):
+        """
+        Test case for invalid take() method inputs without errors.
+        """
         expected_interval = (
             datetime(1970, 1, 1),
             datetime(1980, 1, 1) - timedelta(days=1),

@@ -1,7 +1,18 @@
-from Python.accessors_period import Periods
+from unstruwwel.period import Period
 
 
 def get_period(x, uncertain=False):
+    """
+    Get the period from a given input.
+
+    Args:
+        x (str): The input string.
+        uncertain (bool, optional): Flag indicating if the period is uncertain. Defaults to False.
+
+    Returns:
+        str: The extracted period.
+
+    """
     x = x[max(0, len(x) - 4) :]
 
     if uncertain:
@@ -16,6 +27,6 @@ def get_period(x, uncertain=False):
             x[-1] = add_char + y[0]
 
     # Placeholder for Periods class instantiation and set_additions method
-    x_date = Periods(x).set_additions(x)
+    x_date = Period(x).set_additions(x)
 
     return x_date
