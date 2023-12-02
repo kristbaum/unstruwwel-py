@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 from unstruwwel.period import Period
 
@@ -48,17 +48,16 @@ class Century(Period):
             raise ValueError(
                 "Value must be between 1 and 21, inclusive, or its negative counterpart."
             )
-
         if value < 0:
             start_year = 1 - (abs(value + 1) * 100)
             end_year = start_year + 100
         else:
-            start_year = (value - 1) * 100
+            start_year = ((value - 1) * 100) + 1
             end_year = start_year + 100
 
         self._interval = (
-            datetime(start_year, 1, 1),
-            datetime(end_year, 1, 1) - timedelta(days=1),
+            date(start_year, 1, 1),
+            date(end_year, 1, 1) - timedelta(days=1),
         )
 
     def _take_early(self):

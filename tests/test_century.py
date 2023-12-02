@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import date
 
 from unstruwwel.century import Century
 
@@ -27,49 +27,49 @@ class TestCentury(unittest.TestCase):
         # First half of the 15th century
         self.assertEqual(
             Century(15).take(1, "half")._interval,
-            (datetime(1401, 1, 1), datetime(1450, 12, 31)),
+            (date(1401, 1, 1), date(1450, 12, 31)),
         )
 
         # Second quarter of the 15th century
         self.assertEqual(
             Century(15).take(2, "quarter")._interval,
-            (datetime(1426, 1, 1), datetime(1450, 12, 31)),
+            (date(1426, 1, 1), date(1450, 12, 31)),
         )
 
         # Last third of the 15th century
         self.assertEqual(
             Century(15).take("last", "third")._interval,
-            (datetime(1467, 1, 1), datetime(1500, 12, 31)),
+            (date(1467, 1, 1), date(1500, 12, 31)),
         )
 
         # Early part of the 15th century
         self.assertEqual(
             Century(15).take(type="early")._interval,
-            (datetime(1401, 1, 1), datetime(1415, 12, 31)),
+            (date(1401, 1, 1), date(1415, 12, 31)),
         )
 
         # Late part of the 15th century
         self.assertEqual(
             Century(15).take(type="late")._interval,
-            (datetime(1486, 1, 1), datetime(1500, 12, 31)),
+            (date(1486, 1, 1), date(1500, 12, 31)),
         )
 
         # Middle of the 15th century
         self.assertEqual(
             Century(15).take(type="mid")._interval,
-            (datetime(1446, 1, 1), datetime(1455, 12, 31)),
+            (date(1446, 1, 1), date(1455, 12, 31)),
         )
 
         # Third decade of the 15th century
         self.assertEqual(
             Century(15).take(3)._interval,
-            (datetime(1421, 1, 1), datetime(1430, 12, 31)),
+            (date(1421, 1, 1), date(1430, 12, 31)),
         )
 
         # Last half of the 15th century
         self.assertEqual(
             Century(15).take("last", "half")._interval,
-            (datetime(1451, 1, 1), datetime(1500, 12, 31)),
+            (date(1451, 1, 1), date(1500, 12, 31)),
         )
 
     def test_negative_century(self):
@@ -78,13 +78,13 @@ class TestCentury(unittest.TestCase):
         """
         # Test for the 1st century BC
         self.assertEqual(
-            Century("-1")._interval, (datetime(-100, 12, 31), datetime(-1, 1, 1))
+            Century("-1")._interval, (date(-100, 12, 31), date(-1, 1, 1))
         )
         self.assertEqual(Century("-1").time_span(), (-100, -1))
 
         # Test for the 15th century BC
         self.assertEqual(
-            Century(-15)._interval, (datetime(-1500, 12, 31), datetime(-1401, 1, 1))
+            Century(-15)._interval, (date(-1500, 12, 31), date(-1401, 1, 1))
         )
         self.assertEqual(Century(-15).time_span(), (-1500, -1401))
 
@@ -95,43 +95,43 @@ class TestCentury(unittest.TestCase):
         # First half of the 15th century BC
         self.assertEqual(
             Century(-15).take(1, "half")._interval,
-            (datetime(-1450, 12, 31), datetime(-1401, 1, 1)),
+            (date(-1450, 12, 31), date(-1401, 1, 1)),
         )
 
         # Second quarter of the 15th century BC
         self.assertEqual(
             Century(-15).take(2, "quarter")._interval,
-            (datetime(-1450, 12, 31), datetime(-1426, 1, 1)),
+            (date(-1450, 12, 31), date(-1426, 1, 1)),
         )
 
         # Last third of the 15th century BC
         self.assertEqual(
             Century(-15).take("last", "third")._interval,
-            (datetime(-1500, 12, 31), datetime(-1467, 1, 1)),
+            (date(-1500, 12, 31), date(-1467, 1, 1)),
         )
 
         # Early part of the 15th century BC
         self.assertEqual(
             Century(-15).take(type="early")._interval,
-            (datetime(-1415, 12, 31), datetime(-1401, 1, 1)),
+            (date(-1415, 12, 31), date(-1401, 1, 1)),
         )
 
         # Late part of the 15th century BC
         self.assertEqual(
             Century(-15).take(type="late")._interval,
-            (datetime(-1500, 12, 31), datetime(-1486, 1, 1)),
+            (date(-1500, 12, 31), date(-1486, 1, 1)),
         )
 
         # Middle of the 15th century BC
         self.assertEqual(
             Century(-15).take(type="mid")._interval,
-            (datetime(-1455, 12, 31), datetime(-1446, 1, 1)),
+            (date(-1455, 12, 31), date(-1446, 1, 1)),
         )
 
         # Third decade of the 15th century BC
         self.assertEqual(
             Century(-15).take(3)._interval,
-            (datetime(-1430, 12, 31), datetime(-1421, 1, 1)),
+            (date(-1430, 12, 31), date(-1421, 1, 1)),
         )
 
     def test_invalid_take_with_errors(self):
@@ -160,7 +160,7 @@ class TestCentury(unittest.TestCase):
         Test case for invalid take() inputs without errors.
         """
         century = Century(15)
-        expected_interval = (datetime(1401, 1, 1), datetime(1500, 12, 31))
+        expected_interval = (date(1401, 1, 1), date(1500, 12, 31))
 
         self.assertEqual(
             century.take(999, ignore_errors=True)._interval, expected_interval

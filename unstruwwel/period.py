@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 
 class Period:
@@ -37,9 +37,7 @@ class Period:
             if isinstance(arg, Period):
                 intervals.append(arg._interval)
                 fuzzy_flags.append(arg.fuzzy)
-            elif isinstance(
-                arg, tuple
-            ):  # Assuming interval is a tuple of datetime objects
+            elif isinstance(arg, tuple):  # Assuming interval is a tuple of date objects
                 intervals.append(arg)
             else:
                 # Handle numerical scalars here
@@ -68,8 +66,8 @@ class Period:
 
         """
         # Initialize with extreme dates
-        earliest_start = datetime.max
-        latest_end = datetime.min
+        earliest_start = date.max
+        latest_end = date.min
 
         for interval in intervals:
             start, end = interval
@@ -136,11 +134,11 @@ class Period:
 
         if self.express != 0:
             if self.express < 0:
-                start_x = datetime.min
+                start_x = date.min
                 end_x = standardized_interval[0] - timedelta(days=1)
             elif self.express > 0:
                 start_x = standardized_interval[1] + timedelta(days=1)
-                end_x = datetime.max
+                end_x = date.max
 
             standardized_interval = (start_x, end_x)
 
