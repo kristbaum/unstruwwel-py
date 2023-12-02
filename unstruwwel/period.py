@@ -94,7 +94,6 @@ class Period:
 
         """
         max_value = {"quarter": 4, "third": 3, "half": 2}.get(type, 10)
-
         if x == "last":
             x = max_value
         elif x == "first":
@@ -112,6 +111,9 @@ class Period:
         else:
             new_start_date = start_date + timedelta(days=(x - 1) * step * 365.25)
             new_end_date = start_date + timedelta(days=x * step * 365.25 - 1)
+            # special case for third part of century
+            if step == 33 and x == 3:
+                new_end_date = start_date + timedelta(days=(100 * 365.25) - 2)  
 
         self._interval = (new_start_date, new_end_date)
 
@@ -254,6 +256,7 @@ class Period:
             else:
                 # Handle cases where type is None or x defines a year or decade
                 if x is not None:
+                    print("x is a number")
                     # Placeholder for logic to handle numerical value of x
                     # This part needs to be implemented based on specific requirements
                     pass
