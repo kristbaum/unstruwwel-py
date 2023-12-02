@@ -52,23 +52,27 @@ class Period:
         return (earliest_start, latest_end)
 
     def _take_period(self, x, type):
-        # Placeholder for actual logic to calculate time interval
         max_value = {"quarter": 4, "third": 3, "half": 2}.get(type, 10)
 
         if x == "last":
             x = max_value
-        if x == "first":
+        elif x == "first":
             x = 1
+        elif not 1 <= x <= max_value:
+            raise ValueError(f"Invalid value for x based on type '{type}'")
 
-        # Ensure x is within valid range
-        if not 1 <= x <= max_value:
-            raise ValueError("Invalid value for x based on type")
+        start_date, end_date = self._interval
+        n_years = (end_date - start_date).days / 365.25
+        step = round(n_years / max_value)
 
-        # Example logic to set interval (to be adapted based on R logic)
-        # self._interval = some calculated interval
+        if start_date.year < 0:  # Handling BC dates
+            new_start_date = end_date - timedelta(days=(x - 1) * step * 365.25)
+            new_end_date = end_date - timedelta(days=x * step * 365.25 - 1)
+        else:
+            new_start_date = start_date + timedelta(days=(x - 1) * step * 365.25)
+            new_end_date = start_date + timedelta(days=x * step * 365.25 - 1)
 
-        # The actual logic to calculate the interval will depend on the
-        # details of how intervals are represented and calculated in the R code
+        self._interval = (new_start_date, new_end_date)
 
     @property
     def interval(self):
@@ -148,25 +152,27 @@ class Period:
 
     def take(self, x=None, type=None, ignore_errors=False):
         try:
-            if type:
-                type = type.lower()
-                if type in ["early", "mid", "late"]:
-                    # Placeholder for handling 'early', 'mid', 'late'
-                    pass
-                elif type in ["quarter", "third", "half"]:
-                    # Call self._take_period with appropriate arguments
-                    self._take_period(x, type)
+            # Ensure type is a string or None
+            if type is not None:
+                type = str(type).lower()
+
+            if type in ["early", "mid", "late"]:
+                method_name = f"_take_{type}"
+                if hasattr(self, method_name):
+                    self._interval = getattr(self, method_name)()
                 else:
-                    # Handle other types or raise an error for unsupported types
-                    pass
+                    raise ValueError(f"Unsupported type: {type}")
+            elif type in ["quarter", "third", "half"]:
+                self._take_period(x, type)
             else:
                 # Handle cases where type is None or x defines a year or decade
-                pass
+                if x is not None:
+                    # Placeholder for logic to handle numerical value of x
+                    # This part needs to be implemented based on specific requirements
+                    pass
 
             # Create and return a new Periods object with adjusted interval
-            return Period(
-                self._interval
-            )  # Assuming _interval is adjusted by this method
+            return Period(self._interval)
         except Exception as e:
             if ignore_errors:
                 return self

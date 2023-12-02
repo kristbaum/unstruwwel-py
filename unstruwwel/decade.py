@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
-from Python.accessors_period import Periods
+from unstruwwel.period import Period
 
 
-class Decade(Periods):
+class Decade(Period):
     def __init__(self, value, official_def=False):
         super().__init__()
         value = int(value)
