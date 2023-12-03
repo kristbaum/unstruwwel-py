@@ -1,18 +1,17 @@
 import re
 from langdetect import detect
+import logging
 
 
-def unstruwwel(x, language=None, verbose=True, scheme="time-span", fuzzify=(0, 0)):
+def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
     """
     Unstruwwel function processes a list of input strings and performs various operations on them.
 
     Args:
-        x (list): The input list of strings to be processed.
-        language (list or None, optional): The language of each string in the input list. If None, language detection will be performed. Defaults to None.
+        unprocessed_date (str): The input date to be processed.
+        language (str or None, optional): The language the input String. If None, language detection will be performed. Defaults to None.
         verbose (bool, optional): Whether to display verbose output. Defaults to True.
         scheme (str, optional): The scheme to use for processing dates. Valid options are "iso-format", "time-span", and "object". Defaults to "time-span".
-        fuzzify (tuple, optional): The fuzzification parameters for processing dates. It should be a numeric tuple of length 2. Defaults to (0, 0).
-
     Returns:
         list: The processed dates.
 
@@ -20,20 +19,19 @@ def unstruwwel(x, language=None, verbose=True, scheme="time-span", fuzzify=(0, 0
         AssertionError: If the input is not valid.
 
     """
+    logging.basicConfig(level=logging.INFO)
     # Convert input to list if not already
-    x = list(x) if not isinstance(x, list) else x
+    unprocessed_date = list(unprocessed_date) if not isinstance(unprocessed_date, list) else unprocessed_date
 
     # Validate input
     assert isinstance(verbose, bool), "verbose must be a boolean"
-    assert isinstance(x, list) and len(x) > 0, "x must be a non-empty list"
-    assert len(fuzzify) == 2 and all(
-        isinstance(n, (int, float)) for n in fuzzify
-    ), "fuzzify must be a numeric tuple of length 2"
+    assert isinstance(unprocessed_date, list) and len(unprocessed_date) > 0, "x must be a non-empty list"
     assert scheme in ["iso-format", "time-span", "object"], "Invalid scheme"
 
     # Language detection and validation (needs implementation)
     if language is None:
-        language = [detect(item) for item in x]
+        language = [detect(unprocessed_date)]
+        logging.info(f"Language detected: {language}")
 
     # More implementation needed for processing dates...
     processed_dates = []
