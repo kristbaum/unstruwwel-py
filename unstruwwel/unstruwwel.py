@@ -1,7 +1,7 @@
 import re
 from langdetect import detect
 import logging
-
+from languages import languages
 
 def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
     """
@@ -20,12 +20,10 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
 
     """
     logging.basicConfig(level=logging.INFO)
-    # Convert input to list if not already
-    unprocessed_date = list(unprocessed_date) if not isinstance(unprocessed_date, list) else unprocessed_date
 
     # Validate input
     assert isinstance(verbose, bool), "verbose must be a boolean"
-    assert isinstance(unprocessed_date, list) and len(unprocessed_date) > 0, "x must be a non-empty list"
+    assert isinstance(unprocessed_date, str) and len(unprocessed_date) > 0, "unprocessed_date must be a non-empty string"
     assert scheme in ["iso-format", "time-span", "object"], "Invalid scheme"
 
     # Language detection and validation (needs implementation)
@@ -33,43 +31,43 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
         language = [detect(unprocessed_date)]
         logging.info(f"Language detected: {language}")
 
-    # More implementation needed for processing dates...
+    standardized_input = standardize_input([unprocessed_date], language)
     processed_dates = []
     return processed_dates
 
 
-def standardize_vector(x, language, remove=None):
-    """
-    Standardize_vector function standardizes a vector of strings based on language and removal patterns.
+def standardize_string(x, language_name, remove=None):
+    # Filter the language data
+    language = languages[languages['name'] == language_name.lower()]
 
-    Args:
-        x (list): The input list of strings to be standardized.
-        language (dict or DataFrame): The language data used for filtering and processing strings.
-        remove (str or None, optional): The removal pattern for filtering strings. Defaults to None.
+    # Construct the list of words to remove
+    remove = remove or []
+    for stop_words in language['stop_words'].iloc[0]:
+        remove.extend(stop_words)
 
-    Returns:
-        list: The standardized vector.
+    # Remove the words
+    if remove:
+        remove_regex = '|'.join(map(re.escape, remove))
+        x = re.sub(remove_regex, '', x)
 
-    """
-    # Assume 'languages' is a dictionary or DataFrame containing language data
-    # Filtering and processing strings based on language and removal patterns
-    # Implementation details depend on the structure of 'languages' data
-    # Return the standardized vector
-    standardized_x = []
-    return standardized_x
+    # Get the replacements
+    replacements = language['replacements'].iloc[0]
+    replacements = replacements[replacements['before'] != replacements['after']].drop_duplicates()
+
+    # Replace using the replacements
+    for _, row in replacements.iterrows():
+        pattern = row['pattern']
+        x = re.sub(pattern, row['after'], x)
+
+    # Squish spaces (replace multiple spaces with a single space)
+    x = re.sub(r'\s+', ' ', x).strip()
+
+    return x
 
 
-def extract_groups(x):
-    """
-    Extract_groups function extracts groups from strings using regular expressions.
-
-    Args:
-        x (list): The input list of strings to extract groups from.
-
-    Returns:
-        list: The extracted groups.
-
-    """
-    # Extract groups using regular expressions (needs implementation)
-    groups = []
-    return groups
+def extract_groups(text):
+    capture_groups = r"([0-9]+)|([^\W\d_]+)|(\?)"
+    matches = re.findall(capture_groups, text)
+    # re.findall returns tuples, so we need to filter out empty matches
+    matches = [''.join(match) for match in matches]
+    return matches
