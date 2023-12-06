@@ -1,7 +1,8 @@
 import re
-from langdetect import detect
+from langdetect import detect, LangDetectException
 import logging
-from languages import languages
+from languages import LanguageProcessor
+
 
 def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
     """
@@ -23,44 +24,54 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
 
     # Validate input
     assert isinstance(verbose, bool), "verbose must be a boolean"
-    assert isinstance(unprocessed_date, str) and len(unprocessed_date) > 0, "unprocessed_date must be a non-empty string"
+    assert (
+        isinstance(unprocessed_date, str) and len(unprocessed_date) > 0
+    ), "unprocessed_date must be a non-empty string"
     assert scheme in ["iso-format", "time-span", "object"], "Invalid scheme"
 
     # Language detection and validation (needs implementation)
     if language is None:
-        language = [detect(unprocessed_date)]
-        logging.info(f"Language detected: {language}")
+        try:
+            language = detect(unprocessed_date)
+            logging.info("Language detected: %s", language)
+        except LangDetectException as e:
+            logging.error("Language detection failed, setting to 'en': %s", e)
+            language = "en"
 
-    standardized_input = standardize_input([unprocessed_date], language)
+    standardized_input = standardize_string(unprocessed_date, language)
+    logging.info("Standardized input: %s", standardized_input)
     processed_dates = []
     return processed_dates
 
 
 def standardize_string(x, language_name, remove=None):
     # Filter the language data
-    language = languages[languages['name'] == language_name.lower()]
-
+    print(LanguageProcessor)
+    # language = languages[languages["name"] == language_name.lower()]
+    language = "en"
     # Construct the list of words to remove
     remove = remove or []
-    for stop_words in language['stop_words'].iloc[0]:
+    for stop_words in language["stop_words"].iloc[0]:
         remove.extend(stop_words)
 
     # Remove the words
     if remove:
-        remove_regex = '|'.join(map(re.escape, remove))
-        x = re.sub(remove_regex, '', x)
+        remove_regex = "|".join(map(re.escape, remove))
+        x = re.sub(remove_regex, "", x)
 
     # Get the replacements
-    replacements = language['replacements'].iloc[0]
-    replacements = replacements[replacements['before'] != replacements['after']].drop_duplicates()
+    replacements = language["replacements"].iloc[0]
+    replacements = replacements[
+        replacements["before"] != replacements["after"]
+    ].drop_duplicates()
 
     # Replace using the replacements
     for _, row in replacements.iterrows():
-        pattern = row['pattern']
-        x = re.sub(pattern, row['after'], x)
+        pattern = row["pattern"]
+        x = re.sub(pattern, row["after"], x)
 
     # Squish spaces (replace multiple spaces with a single space)
-    x = re.sub(r'\s+', ' ', x).strip()
+    x = re.sub(r"\s+", " ", x).strip()
 
     return x
 
@@ -69,5 +80,9 @@ def extract_groups(text):
     capture_groups = r"([0-9]+)|([^\W\d_]+)|(\?)"
     matches = re.findall(capture_groups, text)
     # re.findall returns tuples, so we need to filter out empty matches
-    matches = [''.join(match) for match in matches]
+    matches = ["".join(match) for match in matches]
     return matches
+
+
+if __name__ == "__main__":
+    unstruwwel("1990")
