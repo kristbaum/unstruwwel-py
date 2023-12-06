@@ -7,15 +7,30 @@ import glob
 
 class LanguageProcessor:
     def __init__(self, data_path="./data-raw"):
+        """
+        Initialize the LanguageProcessor class.
+
+        Parameters:
+        - data_path (str): The path to the directory containing the language JSON files. Default is "./data-raw".
+        """
         self.languages = None
         self.load_languages(data_path)
 
     @staticmethod
-    def get_search_variants(x):
+    def get_search_variants(input_str):
+        """
+        Generate search variants for a given string.
+
+        Parameters:
+        - input_str (str): The input string.
+
+        Returns:
+        - regex (str): The regular expression pattern for the search variants.
+        """
         variants = [
-            f"[{char}|{char.upper()}]{x[i+1:]}"
-            for i, char in enumerate(x)
-            if i < len(x) - 1
+            f"[{char}|{char.upper()}]{input_str[i+1:]}"
+            for i, char in enumerate(input_str)
+            if i < len(input_str) - 1
         ]
         valid_chars = r"^\p{L}"  # unicode-friendly
         regex = "|".join(
@@ -27,6 +42,15 @@ class LanguageProcessor:
         return regex
 
     def get_language(self, file):
+        """
+        Get the language details from a JSON file.
+
+        Parameters:
+        - file (str): The path to the JSON file.
+
+        Returns:
+        - language (dict): The language details including name, date_order, stop_words, simplifications, and replacements.
+        """
         with open(file, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -65,6 +89,13 @@ class LanguageProcessor:
         return language
 
     def add_language(self, language_name, path):
+        """
+        Add a new language JSON file.
+
+        Parameters:
+        - language_name (str): The name of the language.
+        - path (str): The path to the directory containing the language JSON files.
+        """
         files = glob.glob(os.path.join(path, "*.json"))
         wrappers = []
 
@@ -83,5 +114,11 @@ class LanguageProcessor:
             json.dump(wrappers[index], f, indent=4)
 
     def load_languages(self, data_path):
+        """
+        Load the language JSON files.
+
+        Parameters:
+        - data_path (str): The path to the directory containing the language JSON files.
+        """
         language_files = glob.glob(os.path.join(data_path, "*.json"))
         self.languages = pd.concat([self.get_language(file) for file in language_files])

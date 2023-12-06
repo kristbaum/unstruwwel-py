@@ -10,9 +10,10 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
 
     Args:
         unprocessed_date (str): The input date to be processed.
-        language (str or None, optional): The language the input String. If None, language detection will be performed. Defaults to None.
+        language (str or None, optional): The language of the input string. If None, language detection will be performed. Defaults to None.
         verbose (bool, optional): Whether to display verbose output. Defaults to True.
         scheme (str, optional): The scheme to use for processing dates. Valid options are "iso-format", "time-span", and "object". Defaults to "time-span".
+
     Returns:
         list: The processed dates.
 
@@ -44,7 +45,19 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
     return processed_dates
 
 
-def standardize_string(x, language_name, remove=None):
+def standardize_string(input_string, language_name, remove=None):
+    """
+    Standardizes a string based on the specified language.
+
+    Args:
+        input_string (str): The input string to be standardized.
+        language_name (str): The name of the language.
+        remove (list or None, optional): List of words to remove from the string. Defaults to None.
+
+    Returns:
+        str: The standardized string.
+
+    """
     # Filter the language data
     print(LanguageProcessor)
     # language = languages[languages["name"] == language_name.lower()]
@@ -57,7 +70,7 @@ def standardize_string(x, language_name, remove=None):
     # Remove the words
     if remove:
         remove_regex = "|".join(map(re.escape, remove))
-        x = re.sub(remove_regex, "", x)
+        input_string = re.sub(remove_regex, "", input_string)
 
     # Get the replacements
     replacements = language["replacements"].iloc[0]
@@ -68,15 +81,25 @@ def standardize_string(x, language_name, remove=None):
     # Replace using the replacements
     for _, row in replacements.iterrows():
         pattern = row["pattern"]
-        x = re.sub(pattern, row["after"], x)
+        input_string = re.sub(pattern, row["after"], input_string)
 
     # Squish spaces (replace multiple spaces with a single space)
-    x = re.sub(r"\s+", " ", x).strip()
+    input_string = re.sub(r"\s+", " ", input_string).strip()
 
-    return x
+    return input_string
 
 
 def extract_groups(text):
+    """
+    Extracts groups from a text using regular expressions.
+
+    Args:
+        text (str): The input text.
+
+    Returns:
+        list: The extracted groups.
+
+    """
     capture_groups = r"([0-9]+)|([^\W\d_]+)|(\?)"
     matches = re.findall(capture_groups, text)
     # re.findall returns tuples, so we need to filter out empty matches
