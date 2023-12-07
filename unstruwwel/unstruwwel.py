@@ -25,6 +25,8 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
 
     # Validate input
     assert isinstance(verbose, bool), "verbose must be a boolean"
+    if verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
     assert (
         isinstance(unprocessed_date, str) and len(unprocessed_date) > 0
     ), "unprocessed_date must be a non-empty string"
@@ -59,7 +61,8 @@ def standardize_string(input_string, language_name, remove=None):
 
     """
     # Filter the language data
-    print(LanguageProcessor)
+    language_processor = LanguageProcessor()
+    logging.info(language_processor)
     # language = languages[languages["name"] == language_name.lower()]
     language = "en"
     # Construct the list of words to remove
@@ -108,4 +111,4 @@ def extract_groups(text):
 
 
 if __name__ == "__main__":
-    unstruwwel("1990")
+    unstruwwel("1990", verbose=True)
