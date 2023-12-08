@@ -2,7 +2,7 @@ import re
 import logging
 from langdetect import detect, LangDetectException
 from languages import LanguageProcessor
-from unstruwwel.date_parser import DateParser
+from date_parser import DateParser
 
 
 def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
@@ -89,7 +89,6 @@ def standardize_string(input_string, language_name, remove=None):
     # Iterate over each replacement rule and apply it to the input string.
     # 're.sub' is used to find and replace patterns defined in 'replacements'.
     for replacement in replacements:
-        logging.debug("Applying replacement: %s", replacement)
         input_string = re.sub(
             replacement["pattern"], replacement["after"], input_string
         )

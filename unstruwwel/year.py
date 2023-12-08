@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import calendar
-
-from unstruwwel.period import Period
+from period import Period
 
 
 class Year(Period):

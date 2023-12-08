@@ -1,6 +1,7 @@
-from unstruwwel.century import Century
-from unstruwwel.decade import Decade
-from unstruwwel.year import Year
+import logging
+from century import Century
+from decade import Decade
+from year import Year
 import utils
 
 
@@ -17,6 +18,7 @@ class DateParser:
         Returns:
             The processed date in the specified format.
         """
+        logging.info("Processing date: %s with schema: %s", date_parts, scheme)
 
         # Check for 'century' or a year in x
         if "century" in date_parts or any(utils.is_year(item) for item in date_parts):

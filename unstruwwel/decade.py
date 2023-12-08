@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-
-from unstruwwel.period import Period
+from period import Period
 
 
 class Decade(Period):
