@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import glob
+import re
 
 
 class LanguageProcessor:
@@ -33,20 +34,16 @@ class LanguageProcessor:
         words = input_str.split()
 
         # Create variants for each word with the first letter in both lower and upper case
+        # Note: Removed the '|' character inside the character set as it is unnecessary
         variants = [
-            "[{}|{}]{}".format(word[0].lower(), word[0].upper(), word[1:])
+            "[{}{}]{}".format(word[0].lower(), word[0].upper(), re.escape(word[1:]))
             for word in words
         ]
 
-        # Define a pattern for valid characters (unicode friendly)
-        valid_chars = "\\p{L}"  # Note: Python's `re` module does not support Unicode property escapes by default
-
         # Join the variants with spaces and create a regular expression pattern
-        pattern = "(?<=[{valid_chars}]|^){variants}(?=[{valid_chars}]|$)".format(
-            valid_chars=valid_chars, variants=" ".join(variants)
-        )
-        logging.debug("input_str: %s", input_str)
-        logging.debug("Search variants: %s", pattern)
+        # Using '\\b' (word boundary) instead of trying to match Unicode letters
+        pattern = "\\b{}\\b".format("\\b|\\b".join(variants))
+
         return pattern
 
     def __parse_language(self, file_path):
@@ -77,12 +74,11 @@ class LanguageProcessor:
                 for simplification in language_data["simplifications"]
             ],
         }
-        logging.debug("Language details: %s", json.dumps(language_details, indent=4))
 
         replacement_list = [
             {
                 "before": key.lower(),
-                "after": value,
+                "after": value[0],
                 "pattern": self.get_search_variants(key.lower()),
             }
             for key, value in language_data.items()

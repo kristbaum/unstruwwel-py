@@ -43,46 +43,59 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
 
     standardized_input = standardize_string(unprocessed_date, language)
     logging.info("Standardized input: %s", standardized_input)
+    extracted_groups = extract_groups(standardized_input)
+    logging.info(extract_groups(extracted_groups))
     processed_dates = []
     return processed_dates
 
 
 def standardize_string(input_string, language_name, remove=None):
     """
-    Standardizes a string based on the specified language.
+    Standardizes a string based on the specified language. It involves removing specified words,
+    applying language-specific replacements, and squishing multiple spaces into a single space.
 
     Args:
         input_string (str): The input string to be standardized.
-        language_name (str): The name of the language.
-        remove (list or None, optional): List of words to remove from the string. Defaults to None.
+        language_name (str): The name of the language for which the standardization rules apply.
+        remove (list or None, optional): Additional list of words to remove from the string. Defaults to None.
 
     Returns:
         str: The standardized string.
     """
-    # Initialize the LanguageProcessor and load the language data
     language_processor = LanguageProcessor()
     language = language_processor.get_language(language_name)
 
-    # Construct the list of words to remove
     remove = remove or []
+
+    # Extend the 'remove' list with stop words specific to the chosen language.
+    # Stop words are common words in a language that are often filtered out in language processing.
     remove.extend(language["stop_words"])
 
-    # Remove the words
+    # If there are words to remove, construct a regular expression pattern to match them.
+    # 're.escape' is used to escape any special characters in the words to remove.
     if remove:
         remove_regex = "|".join(map(re.escape, remove))
+
+        # Apply the regex pattern to remove the matching words from the input string.
         input_string = re.sub(remove_regex, "", input_string)
 
-    # Get the replacements
+    # Retrieve the list of replacement patterns defined for the language.
+    # These patterns specify how certain words or phrases should be altered.
     replacements = language["replacements"]
 
-    # Replace using the replacements
+    # Iterate over each replacement rule and apply it to the input string.
+    # 're.sub' is used to find and replace patterns defined in 'replacements'.
     for replacement in replacements:
-        pattern = replacement["pattern"]
-        input_string = re.sub(pattern, replacement["after"], input_string)
+        logging.debug("Applying replacement: %s", replacement)
+        input_string = re.sub(
+            replacement["pattern"], replacement["after"], input_string
+        )
 
-    # Squish spaces (replace multiple spaces with a single space)
+    # Finally, squish multiple spaces into a single space and trim leading/trailing spaces.
+    # This is done to clean up any irregular spacing caused by the earlier replacements.
     input_string = re.sub(r"\s+", " ", input_string).strip()
 
+    # Return the standardized string.
     return input_string
 
 
