@@ -265,7 +265,7 @@ class Period:
                             date(year_within_decade, 1, 1),
                             date(year_within_decade + 1, 1, 1) - timedelta(days=1),
                         )
-                    elif type(self).__name__  == "Century":
+                    elif type(self).__name__ == "Century":
                         # For centuries, x could represent a specific portion, like a decade
                         decade_within_century = self._interval[0].year + (x - 1) * 10
                         self._interval = (

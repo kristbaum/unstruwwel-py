@@ -117,6 +117,7 @@ class Century(Period):
             new_end_date = end_date
         return (new_start_date, new_end_date)
 
+    @property
     def time_span(self):
         """
         Returns the start and end years of the century.

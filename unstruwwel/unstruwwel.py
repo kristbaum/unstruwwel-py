@@ -2,6 +2,7 @@ import re
 import logging
 from langdetect import detect, LangDetectException
 from languages import LanguageProcessor
+from unstruwwel.date_parser import DateParser
 
 
 def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
@@ -45,8 +46,10 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
     logging.info("Standardized input: %s", standardized_input)
     extracted_groups = extract_groups(standardized_input)
     logging.info(extract_groups(extracted_groups))
-    processed_dates = []
-    return processed_dates
+    parser = DateParser()
+    result = parser.get_dates(extracted_groups, scheme=scheme)
+    logging.info("Result: %s", result)
+    return result
 
 
 def standardize_string(input_string, language_name, remove=None):
