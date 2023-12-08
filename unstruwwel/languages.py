@@ -12,33 +12,30 @@ class LanguageProcessor:
         Parameters:
         - data_path (str): The path to the directory containing the language JSON files. Default is "./data-raw".
         """
-        self.languages = None
+        self.languages = []
         self.load_languages(data_path)
 
     @staticmethod
     def get_search_variants(input_str):
-        """
-        Generate search variants for a given string.
+        # Split the string into words
+        words = input_str.split()
 
-        Parameters:
-        - input_str (str): The input string.
-
-        Returns:
-        - regex (str): The regular expression pattern for the search variants.
-        """
+        # Create variants for each word with the first letter in both lower and upper case
         variants = [
-            f"[{char}|{char.upper()}]{input_str[i+1:]}"
-            for i, char in enumerate(input_str)
-            if i < len(input_str) - 1
+            "[{}|{}]{}".format(word[0].lower(), word[0].upper(), word[1:])
+            for word in words
         ]
-        valid_chars = r"^\p{L}"  # unicode-friendly
-        regex = "|".join(
-            [
-                f"(?<=[{valid_chars}]|^){variant}(?=[{valid_chars}]|$)"
-                for variant in variants
-            ]
+
+        # Define a pattern for valid characters (unicode friendly)
+        valid_chars = "\\p{L}"  # Note: Python's `re` module does not support Unicode property escapes by default
+
+        # Join the variants with spaces and create a regular expression pattern
+        pattern = "(?<=[{valid_chars}]|^){variants}(?=[{valid_chars}]|$)".format(
+            valid_chars=valid_chars, variants=" ".join(variants)
         )
-        return regex
+        logging.debug("input_str: %s", input_str)
+        logging.debug("Search variants: %s", pattern)
+        return pattern
 
     def get_language(self, file_path):
         """
@@ -124,8 +121,7 @@ class LanguageProcessor:
         language_files = [f for f in os.listdir(data_path) if f.endswith(".json")]
         logging.info("Loading language files: %s", language_files)
 
-        self.languages = {}
         for file in language_files:
             file_path = os.path.join(data_path, file)
             language_data = self.get_language(file_path)
-            self.languages[language_data["name"]] = language_data["details"]
+            self.languages.append(language_data)
