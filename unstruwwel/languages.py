@@ -13,7 +13,19 @@ class LanguageProcessor:
         - data_path (str): The path to the directory containing the language JSON files. Default is "./data-raw".
         """
         self.languages = []
-        self.load_languages(data_path)
+        language_files = [f for f in os.listdir(data_path) if f.endswith(".json")]
+        logging.info("Loading language files: %s", language_files)
+
+        for file in language_files:
+            file_path = os.path.join(data_path, file)
+            language_data = self.__parse_language(file_path)
+            self.languages.append(language_data)
+
+    def get_language(self, language_name):
+        for language in self.languages:
+            if language["name"] == language_name.lower():
+                return language
+        raise ValueError("Language not available or not implemented yet.")
 
     @staticmethod
     def get_search_variants(input_str):
@@ -37,7 +49,7 @@ class LanguageProcessor:
         logging.debug("Search variants: %s", pattern)
         return pattern
 
-    def get_language(self, file_path):
+    def __parse_language(self, file_path):
         """
         Get the language details from a JSON file.
 
@@ -110,18 +122,3 @@ class LanguageProcessor:
                 os.path.join(path, f"{language_name}.json"), "w", encoding="utf-8"
             ) as f:
                 json.dump(new_language_data, f, indent=4)
-
-    def load_languages(self, data_path):
-        """
-        Load the language JSON files.
-
-        Parameters:
-        - data_path (str): The path to the directory containing the language JSON files.
-        """
-        language_files = [f for f in os.listdir(data_path) if f.endswith(".json")]
-        logging.info("Loading language files: %s", language_files)
-
-        for file in language_files:
-            file_path = os.path.join(data_path, file)
-            language_data = self.get_language(file_path)
-            self.languages.append(language_data)

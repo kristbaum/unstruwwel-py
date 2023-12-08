@@ -1,6 +1,6 @@
 import re
-from langdetect import detect, LangDetectException
 import logging
+from langdetect import detect, LangDetectException
 from languages import LanguageProcessor
 
 
@@ -58,17 +58,14 @@ def standardize_string(input_string, language_name, remove=None):
 
     Returns:
         str: The standardized string.
-
     """
-    # Filter the language data
+    # Initialize the LanguageProcessor and load the language data
     language_processor = LanguageProcessor()
-    logging.info(language_processor)
-    # language = languages[languages["name"] == language_name.lower()]
-    language = "en"
+    language = language_processor.get_language(language_name)
+
     # Construct the list of words to remove
     remove = remove or []
-    for stop_words in language["stop_words"].iloc[0]:
-        remove.extend(stop_words)
+    remove.extend(language["stop_words"])
 
     # Remove the words
     if remove:
@@ -76,15 +73,12 @@ def standardize_string(input_string, language_name, remove=None):
         input_string = re.sub(remove_regex, "", input_string)
 
     # Get the replacements
-    replacements = language["replacements"].iloc[0]
-    replacements = replacements[
-        replacements["before"] != replacements["after"]
-    ].drop_duplicates()
+    replacements = language["replacements"]
 
     # Replace using the replacements
-    for _, row in replacements.iterrows():
-        pattern = row["pattern"]
-        input_string = re.sub(pattern, row["after"], input_string)
+    for replacement in replacements:
+        pattern = replacement["pattern"]
+        input_string = re.sub(pattern, replacement["after"], input_string)
 
     # Squish spaces (replace multiple spaces with a single space)
     input_string = re.sub(r"\s+", " ", input_string).strip()
@@ -111,4 +105,4 @@ def extract_groups(text):
 
 
 if __name__ == "__main__":
-    unstruwwel("1990", verbose=True)
+    unstruwwel("late 16th century", verbose=True)
