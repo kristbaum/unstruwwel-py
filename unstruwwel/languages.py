@@ -40,45 +40,49 @@ class LanguageProcessor:
         )
         return regex
 
-    def get_language(self, file):
+    def get_language(self, file_path):
         """
         Get the language details from a JSON file.
 
         Parameters:
-        - file (str): The path to the JSON file.
+        - file_path (str): The path to the JSON file.
 
         Returns:
-        - language (dict): The language details including name, date_order, stop_words, simplifications, and replacements.
+        - dict: Language details including name, date_order, stop_words, simplifications, and replacements.
         """
-        with open(file, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        with open(file_path, "r", encoding="utf-8") as file:
+            language_data = json.load(file)
 
-        language = {
-            "name": data["name"].lower(),
-            "date_order": data["date_order"],
+        language_details = {
+            "name": language_data["name"].lower(),
+            "date_order": language_data["date_order"],
             "stop_words": [
-                self.get_search_variants(word.lower()) for word in data["stop_words"]
+                self.get_search_variants(word.lower())
+                for word in language_data["stop_words"]
             ],
             "simplifications": [
-                {"before": s.lower(), "after": self.get_search_variants(s.lower())}
-                for s in data["simplifications"]
+                {
+                    "before": simplification.lower(),
+                    "after": self.get_search_variants(simplification.lower()),
+                }
+                for simplification in language_data["simplifications"]
             ],
         }
-        logging.debug("language: %s", json.dumps(language, indent=4))
+        logging.debug("Language details: %s", json.dumps(language_details, indent=4))
 
-        replacements = [
+        replacement_list = [
             {
-                "before": k.lower(),
-                "after": v,
-                "pattern": self.get_search_variants(k.lower()),
+                "before": key.lower(),
+                "after": value,
+                "pattern": self.get_search_variants(key.lower()),
             }
-            for k, v in data.items()
-            if k not in language
+            for key, value in language_data.items()
+            if key not in language_details
         ]
 
-        language["replacements"] = replacements
+        language_details["replacements"] = replacement_list
 
-        return language
+        return language_details
 
     def add_language(self, language_name, path):
         """
