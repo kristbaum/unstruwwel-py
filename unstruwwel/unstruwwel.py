@@ -45,7 +45,7 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
     standardized_input = standardize_string(unprocessed_date, language)
     logging.info("Standardized input: %s", standardized_input)
     extracted_groups = extract_groups(standardized_input)
-    logging.info(extract_groups(extracted_groups))
+    logging.info(extracted_groups)
     parser = DateParser()
     result = parser.get_dates(extracted_groups, scheme=scheme)
     logging.info("Result: %s", result)
@@ -65,6 +65,7 @@ def standardize_string(input_string, language_name, remove=None):
     Returns:
         str: The standardized string.
     """
+    logging.debug("Standardizing string: %s", input_string)
     language_processor = LanguageProcessor()
     language = language_processor.get_language(language_name)
 
@@ -112,6 +113,7 @@ def extract_groups(text):
         list: The extracted groups.
 
     """
+    logging.debug("Extracting groups from text: %s", text)
     capture_groups = r"([0-9]+)|([^\W\d_]+)|(\?)"
     matches = re.findall(capture_groups, text)
     # re.findall returns tuples, so we need to filter out empty matches
@@ -120,4 +122,4 @@ def extract_groups(text):
 
 
 if __name__ == "__main__":
-    unstruwwel("late 16th century", verbose=True)
+    unstruwwel("1650", scheme="iso-format", verbose=True)

@@ -66,6 +66,7 @@ class DateParser:
         Returns:
             Century object with the processed century information.
         """
+        logging.debug("Processing century: %s", date_parts)
         century_part = [part for part in date_parts if utils.is_year(part)]
         if not century_part:
             raise ValueError("No valid century part found.")
