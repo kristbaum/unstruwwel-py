@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import date
 
 from unstruwwel.period import Period
 
@@ -17,10 +17,10 @@ class TestInvalidPeriod(unittest.TestCase):
         invalid values. Each modification should raise an AttributeError.
 
         """
-        x = Period((datetime(1750, 1, 1), datetime(1750, 12, 31)))
+        x = Period((date(1750, 1, 1), date(1750, 12, 31)))
 
         with self.assertRaises(AttributeError):
-            x.interval = (datetime(1760, 1, 1), datetime(1760, 12, 31))
+            x.interval = (date(1760, 1, 1), date(1760, 12, 31))
 
         with self.assertRaises(AttributeError):
             x.iso_format = "1760-01-01?/1760-12-31?"
