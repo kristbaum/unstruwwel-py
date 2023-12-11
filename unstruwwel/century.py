@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from period import Period
+from unstruwwel.period import Period
 
 
 class Century(Period):

@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 import calendar
-from period import Period
+from unstruwwel.period import Period
 
 
 class Year(Period):
@@ -38,9 +38,9 @@ class Year(Period):
         """
         if self.value < 0:
             self.value = abs(self.value)
-            start_date = datetime(self.value, 1, 1) - timedelta(days=1)
+            start_date = date(self.value, 1, 1) - timedelta(days=1)
         else:
-            start_date = datetime(self.value, 1, 1)
+            start_date = date(self.value, 1, 1)
         self._interval = (start_date, start_date + timedelta(days=365))
 
     def _take_period(self, x, month):
@@ -57,11 +57,11 @@ class Year(Period):
         start_date, end_date = self._interval
         if month:
             month_days = calendar.monthrange(self.value, month)[1]
-            start_date = datetime(self.value, month, 1)
-            end_date = datetime(self.value, month, month_days)
+            start_date = date(self.value, month, 1)
+            end_date = date(self.value, month, month_days)
         if x:
             if 1 <= x <= month_days:
-                return (datetime(self.value, month, x), datetime(self.value, month, x))
+                return (date(self.value, month, x), date(self.value, month, x))
         return (start_date, end_date)
 
     def _take_season(self, season):

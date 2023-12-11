@@ -17,16 +17,16 @@ class TestInvalidPeriod(unittest.TestCase):
         invalid values. Each modification should raise an AttributeError.
 
         """
-        x = Period((date(1750, 1, 1), date(1750, 12, 31)))
+        test_date = Period((date(1750, 1, 1), date(1750, 12, 31)))
 
         with self.assertRaises(AttributeError):
-            x.interval = (date(1760, 1, 1), date(1760, 12, 31))
+            test_date.interval = (date(1760, 1, 1), date(1760, 12, 31))
 
         with self.assertRaises(AttributeError):
-            x.iso_format = "1760-01-01?/1760-12-31?"
+            test_date.iso_format = "1760-01-01?/1760-12-31?"
 
         with self.assertRaises(AttributeError):
-            x.time_span = (1760, 1760)
+            test_date.time_span = (1760, 1760)
 
 
 if __name__ == "__main__":

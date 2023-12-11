@@ -1,8 +1,8 @@
 import logging
-from century import Century
-from decade import Decade
-from year import Year
-import utils
+from unstruwwel.century import Century
+from unstruwwel.decade import Decade
+from unstruwwel.year import Year
+from unstruwwel.utils import is_year
 
 
 class DateParser:
@@ -21,7 +21,7 @@ class DateParser:
         logging.info("Processing date: %s with schema: %s", date_parts, scheme)
 
         # Check for 'century' or a year in x
-        if "century" in date_parts or any(utils.is_year(item) for item in date_parts):
+        if "century" in date_parts or any(is_year(item) for item in date_parts):
             # Process the date based on whether it's a century, decade, or year
             if "century" in date_parts:
                 date_obj = self.get_century(date_parts, negative=False, uncertain=False)
@@ -67,7 +67,7 @@ class DateParser:
             Century object with the processed century information.
         """
         logging.debug("Processing century: %s", date_parts)
-        century_part = [part for part in date_parts if utils.is_year(part)]
+        century_part = [part for part in date_parts if is_year(part)]
         if not century_part:
             raise ValueError("No valid century part found.")
 
@@ -97,7 +97,7 @@ class DateParser:
         Returns:
             Decade object with the processed decade information.
         """
-        decade_part = [part for part in date_parts if utils.is_year(part)]
+        decade_part = [part for part in date_parts if is_year(part)]
         if not decade_part:
             raise ValueError("No valid decade part found.")
 
@@ -123,7 +123,7 @@ class DateParser:
         Returns:
             Year object with the processed year information.
         """
-        year_part = [part for part in date_parts if utils.is_year(part)]
+        year_part = [part for part in date_parts if is_year(part)]
         if not year_part:
             raise ValueError("No valid year part found.")
 

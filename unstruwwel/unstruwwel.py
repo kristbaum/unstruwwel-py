@@ -1,8 +1,11 @@
 import re
 import logging
+import sys
+
 from langdetect import detect, LangDetectException
-from languages import LanguageProcessor
-from date_parser import DateParser
+
+from unstruwwel.date_parser import DateParser
+from unstruwwel.languages import LanguageProcessor
 
 
 def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"):
@@ -32,6 +35,7 @@ def unstruwwel(unprocessed_date, language=None, verbose=True, scheme="time-span"
         isinstance(unprocessed_date, str) and len(unprocessed_date) > 0
     ), "unprocessed_date must be a non-empty string"
     assert scheme in ["iso-format", "time-span", "object"], "Invalid scheme"
+    assert language in ["en", "fr", "de", "nl", None], "Invalid or unsupported language"
 
     # Language detection and validation (needs implementation)
     if language is None:
@@ -122,4 +126,5 @@ def extract_groups(text):
 
 
 if __name__ == "__main__":
+    print(sys.path)
     unstruwwel("1650", scheme="iso-format", verbose=True)

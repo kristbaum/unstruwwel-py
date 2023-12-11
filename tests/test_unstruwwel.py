@@ -10,12 +10,19 @@ class TestUnstruwwel(unittest.TestCase):
     This class contains test methods to verify the functionality of the unstruwwel module.
     """
 
-    def test_no_language(self):
+    def test_unsupported_language(self):
         """
-        Test to ensure an error is raised when no language is provided.
+        Test to ensure an error is raised when not supported language is provided.
         """
         with self.assertRaises(Exception):
-            unstruwwel("1460", scheme="object")
+            unstruwwel("1460", scheme="object",language="el", verbose=True)
+
+    def test_verbose_not_bool(self):
+        """
+        Test to ensure an error is raised when verbose is not a boolean.
+        """
+        with self.assertRaises(Exception):
+            unstruwwel("1460", scheme="object",language="de", verbose=123)
 
     def test_no_date(self):
         """
