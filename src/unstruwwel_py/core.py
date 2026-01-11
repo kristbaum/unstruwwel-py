@@ -110,37 +110,29 @@ def unstruwwel(
         # Multi-extraction
         emit_list: List[Result] = []
         used_spans: List[Tuple[int, int]] = []
-        DE_MONTHS = {
-            "januar": 1,
-            "februar": 2,
-            "märz": 3,
-            "maerz": 3,
-            "april": 4,
-            "mai": 5,
-            "juni": 6,
-            "juli": 7,
-            "august": 8,
-            "september": 9,
-            "oktober": 10,
-            "november": 11,
-            "dezember": 12,
-        }
+
+        # Build before/after patterns from spec
+        before_pat = spec.before_pattern() if spec else r"(?:before)"
+        after_pat = spec.after_pattern() if spec else r"(?:after)"
+        season_pat = (
+            spec.season_pattern() if spec else r"(?:spring|summer|autumn|winter)"
+        )
+
+        # Pattern for day.month year (e.g., "15. januar 1750")
+        de_date_pat = rf"(\d{{1,2}})\.\s*{mon_pat_base}\s+(\d{{3,4}})"
 
         multi_mode = False
-        if re.search(
-            r"(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)\s+(\d{3,4})",
-            low,
-        ):
+        if re.search(de_date_pat, low):
             multi_mode = True
         if "(" in low or ")" in low or " - " in low:
             multi_mode = True
         if multi_mode:
-            for m in re.finditer(
-                r"(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)\s+(\d{3,4})",
-                low,
-            ):
+            for m in re.finditer(rf"(\d{{1,2}})\.\s*{mon_pat_cap}\s+(\d{{3,4}})", low):
                 d = int(m.group(1))
-                mm = DE_MONTHS[m.group(2)]
+                month_tok = m.group(2)
+                mm = spec.months.get(month_tok) if spec else MONTHS.get(month_tok)
+                if mm is None:
+                    continue
                 y = int(m.group(3))
                 p = Period(start=(y, mm, d), end=(y, mm, d))
                 p.fuzzy = fuzzy
@@ -148,18 +140,19 @@ def unstruwwel(
                 used_spans.append((m.start(), m.end()))
 
             for m in re.finditer(
-                r"(vor|bis|spätestens)\s+(dem\s+)?(frühling|sommer|herbst|winter)\s+(-?\d{3,4})",
+                rf"({before_pat})\s+(?:dem\s+)?({season_pat})\s+(-?\d{{3,4}})",
                 low,
             ):
-                season = m.group(3)
-                y = int(m.group(4))
+                season_tok = m.group(2)
+                season_name = spec.seasons.get(season_tok) if spec else season_tok
+                y = int(m.group(3))
                 start_m = (
                     3
-                    if season == "frühling"
+                    if season_name == "spring"
                     else 6
-                    if season == "sommer"
+                    if season_name == "summer"
                     else 9
-                    if season == "herbst"
+                    if season_name == "autumn"
                     else 12
                 )
                 if start_m == 12:
@@ -172,22 +165,23 @@ def unstruwwel(
                 emit_list.append(_emit(p, scheme))
                 used_spans.append((m.start(), m.end()))
             for m in re.finditer(
-                r"(nach|ab|seit|frühestens)\s+(dem\s+)?(frühling|sommer|herbst|winter)\s+(-?\d{3,4})",
+                rf"({after_pat})\s+(?:dem\s+)?({season_pat})\s+(-?\d{{3,4}})",
                 low,
             ):
-                season = m.group(3)
-                y = int(m.group(4))
+                season_tok = m.group(2)
+                season_name = spec.seasons.get(season_tok) if spec else season_tok
+                y = int(m.group(3))
                 start_m = (
                     3
-                    if season == "frühling"
+                    if season_name == "spring"
                     else 6
-                    if season == "sommer"
+                    if season_name == "summer"
                     else 9
-                    if season == "herbst"
+                    if season_name == "autumn"
                     else 12
                 )
                 end_m = start_m + 2
-                if season == "winter":
+                if season_name == "winter":
                     sy, sm, sd = (y + 1, 3, 1)
                 elif end_m >= 12:
                     sy, sm, sd = (y + 1, 1, 1)
@@ -226,14 +220,14 @@ def unstruwwel(
                 p.fuzzy = fuzzy
                 emit_list.append(_emit(p, scheme))
                 used_spans.append((m.start(), m.end()))
-            for m in re.finditer(r"(vor|bis|spätestens)\s+(-?\d{3,4})", low):
+            for m in re.finditer(rf"({before_pat})\s+(-?\d{{3,4}})", low):
                 y = int(m.group(2))
                 p = Period(start=(y, 1, 1), end=(y - 1, 12, 31))
                 p.express = -1
                 p.fuzzy = fuzzy
                 emit_list.append(_emit(p, scheme))
                 used_spans.append((m.start(), m.end()))
-            for m in re.finditer(r"(nach|ab|seit|frühestens)\s+(-?\d{3,4})", low):
+            for m in re.finditer(rf"({after_pat})\s+(-?\d{{3,4}})", low):
                 y = int(m.group(2))
                 p = Period(start=(y + 1, 1, 1), end=(y, 12, 31))
                 p.express = 1
@@ -241,7 +235,7 @@ def unstruwwel(
                 emit_list.append(_emit(p, scheme))
                 used_spans.append((m.start(), m.end()))
 
-            kw = r"(?:vor|bis|spätestens|nach|ab|seit|frühestens)"
+            kw = rf"(?:{before_pat}|{after_pat})"
             for m in re.finditer(rf"(?:(?P<kw>{kw})\s+)?(?P<year>-?\d{{3,4}})", low):
                 s, e = m.start(), m.end()
                 if any(not (e <= a or s >= b) for a, b in used_spans):
@@ -291,36 +285,34 @@ def unstruwwel(
 
         # before/after month-year or year (English and German)
         expr = 0
-        if (
-            low.startswith("before")
-            or low.startswith("spätestens")
-            or low.startswith("bis")
-            or low.startswith("vor")
-        ):
-            expr = -1
-        if (
-            low.startswith("after")
-            or low.startswith("frühestens")
-            or low.startswith("nach")
-            or low.startswith("seit")
-            or low.startswith("ab")
-        ):
-            expr = 1
+        # Check if text starts with a "before" keyword
+        before_keywords = spec.before if spec else {"before"}
+        after_keywords = spec.after if spec else {"after"}
+        for kw in before_keywords:
+            if low.startswith(kw):
+                expr = -1
+                break
+        if expr == 0:
+            for kw in after_keywords:
+                if low.startswith(kw):
+                    expr = 1
+                    break
         if expr != 0:
             ym = re.findall(mon_pat_cap, low)
-            m_season_de = re.search(r"(frühling|sommer|herbst|winter)", low)
-            season_de = m_season_de.group(1) if m_season_de else None
+            m_season = re.search(rf"({season_pat})", low) if spec else None
+            season_tok = m_season.group(1) if m_season else None
+            season_name = spec.seasons.get(season_tok) if spec and season_tok else None
             yx = re.findall(r"(-?\d{3,4})", low)
             if yx:
                 y = int(yx[-1])
-                if season_de:
+                if season_name:
                     start_m = (
                         3
-                        if season_de == "frühling"
+                        if season_name == "spring"
                         else 6
-                        if season_de == "sommer"
+                        if season_name == "summer"
                         else 9
-                        if season_de == "herbst"
+                        if season_name == "autumn"
                         else 12
                     )
                     if expr < 0:

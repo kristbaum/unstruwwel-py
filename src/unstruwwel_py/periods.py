@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Tuple, Union
 
 
@@ -10,47 +10,13 @@ class PeriodError(ValueError):
     pass
 
 
+@dataclass(frozen=True)
 class Periods:
-    """Simple container with write-once attributes to mimic R behavior for tests."""
+    """Immutable container for period interval data."""
 
-    def __init__(self, interval: Tuple[str, str]):
-        self._interval_set = False
-        self._iso_set = False
-        self._span_set = False
-        self._interval = None
-        self._iso_format = None
-        self._time_span = None
-        # initial set allowed
-        self.interval = interval
-
-    @property
-    def interval(self) -> Tuple[str, str]:
-        return self._interval  # type: ignore[return-value]
-
-    @interval.setter
-    def interval(self, value: Tuple[str, str]):
-        if self._interval_set:
-            raise PeriodError("interval is read-only after initialization")
-        self._interval = value
-        self._interval_set = True
-
-    @property
-    def iso_format(self) -> Optional[str]:
-        return self._iso_format
-
-    @iso_format.setter
-    def iso_format(self, value: str):
-        # Disallow external setting entirely
-        raise PeriodError("iso_format is read-only")
-
-    @property
-    def time_span(self) -> DateSpan:
-        return self._time_span
-
-    @time_span.setter
-    def time_span(self, value: DateSpan):
-        # Disallow external setting entirely
-        raise PeriodError("time_span is read-only")
+    interval: Tuple[str, str]
+    iso_format: Optional[str] = field(default=None)
+    time_span: DateSpan = field(default=(None, None))
 
 
 @dataclass
@@ -63,7 +29,7 @@ class Year:
         self.interval = ("", "")
         self.time_span = (self.year, self.year)
 
-    def take(self, day: Optional[int] = None, type: Optional[str] = None):  
+    def take(self, day: Optional[int] = None, type: Optional[str] = None):
         if type not in {
             None,
             "january",
