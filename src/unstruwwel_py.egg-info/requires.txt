@@ -1,0 +1,6 @@
+lingua-language-detector>=2.0.0
+
+[dev]
+pytest>=7
+pytest-cov>=4
+ruff>=0.4

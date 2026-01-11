@@ -25,3 +25,5 @@ env2/
 *.bak
 *.swp
 *~
+.pytest_cache
+.ruff_cache

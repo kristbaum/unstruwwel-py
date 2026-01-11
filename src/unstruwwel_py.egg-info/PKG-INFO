@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: unstruwwel-py
+Version: 0.0.1
+Summary: "Python port of unstruwwel, detect and parse historic dates to ISO 8601"
+Author: Unstruwwel maintainers
+License: MIT
+Keywords: dates,iso8601,historic,nlp,parsing
+Classifier: "Programming Language :: Python :: 3"
+Classifier: "License :: OSI Approved :: MIT License"
+Classifier: "Operating System :: OS Independent"
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: lingua-language-detector>=2.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7; extra == "dev"
+Requires-Dist: pytest-cov>=4; extra == "dev"
+Requires-Dist: ruff>=0.4; extra == "dev"
+Dynamic: license-file
