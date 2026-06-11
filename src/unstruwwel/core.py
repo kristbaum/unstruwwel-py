@@ -55,6 +55,9 @@ def build_century(words, negative, uncertain=False):
         get_century(words[markers[i]:ends[i]], negative)
         for i in range(len(markers))
     ]
+    centuries = [c for c in centuries if c is not None]
+    if not centuries:
+        return None
 
     result = Periods(parts=centuries) if len(centuries) > 1 else centuries[0]
     if uncertain:
@@ -70,7 +73,10 @@ def get_century(words, negative, uncertain=False):
         window[-1] = "-" + str(window[-1])
 
     x_take = [window[-3], window[-2]]
-    period = Century(window[-1]).set_additions(window)
+    try:
+        period = Century(window[-1]).set_additions(window)
+    except (ValueError, TypeError):
+        return None  # no usable century value (e.g. an empty sub-segment)
     return period.take(x_take, ignore_errors=True)
 
 
@@ -80,7 +86,10 @@ def get_decade(words, uncertain=False):
         window = ["?"] + window
 
     x_take = [window[-3], window[-2]]
-    period = Decade(window[-1]).set_additions(window)
+    try:
+        period = Decade(window[-1]).set_additions(window)
+    except (ValueError, TypeError):
+        return None
     return period.take(x_take, ignore_errors=True)
 
 
@@ -96,8 +105,24 @@ def get_year(words, negative, uncertain=False):
     if negative and window[-1] is not None:
         window[-1] = "-" + str(window[-1])
 
-    period = Year(window[-1]).set_additions(window)
+    try:
+        period = Year(window[-1]).set_additions(window)
+    except (ValueError, TypeError):
+        return None  # value out of range (e.g. a typo'd or future year)
     return period.take(x_take, ignore_errors=True)
+
+
+def _is_digits(token) -> bool:
+    return isinstance(token, str) and token.isdigit()
+
+
+def _is_year_token(token) -> bool:
+    """A numeric (optionally negative) year string or an already-built period."""
+    if isinstance(token, Periods):
+        return True
+    if not isinstance(token, str):
+        return False
+    return token[1:].isdigit() if token.startswith("-") else token.isdigit()
 
 
 def get_period(words, uncertain=False):
@@ -105,14 +130,18 @@ def get_period(words, uncertain=False):
     if uncertain:
         window = ["?"] + window
 
-    if len(window) > 1:
-        last_two = list(reversed(window))[:2]
-        lengths = [len(str(t)) for t in last_two]
-        if lengths[0] < lengths[1]:
-            prefix = str(last_two[1])[: lengths[1] - lengths[0]]
-            window[-1] = prefix + str(last_two[0])
+    # Complete an abbreviated trailing year, e.g. "1656 57" -> "1656 1657" or
+    # "1713 14" -> "1713 1714". Only meaningful when both trailing tokens are
+    # plain digit strings; never run string surgery on words or period objects.
+    if len(window) > 1 and _is_digits(window[-1]) and _is_digits(window[-2]):
+        last, prev = window[-1], window[-2]
+        if len(last) < len(prev):
+            window[-1] = prev[: len(prev) - len(last)] + last
 
-    return Periods(parts=window).set_additions(window)
+    # Only digit strings / period objects are valid interval parts; word tokens
+    # such as "approximate", "before" or "?" are flags read by set_additions.
+    parts = [t for t in window if _is_year_token(t)]
+    return Periods(parts=parts).set_additions(window)
 
 
 # -- the core resolver -------------------------------------------------------

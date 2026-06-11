@@ -1,4 +1,6 @@
+import csv
 import math
+import pathlib
 
 import pytest
 
@@ -148,3 +150,86 @@ def test_invalid_scheme():
 def test_list_input_returns_list():
     result = unstruwwel(["1842", "1900"], "en")
     assert result == [(1842, 1842), (1900, 1900)]
+
+
+# -- Real-world examples drawn from tests/verbal_dating.csv ------------------
+# These are verbal datings harvested from the Deckenmalerei research database.
+# They exercise patterns that the first port did not yet handle.
+
+@pytest.mark.parametrize("text, expected", [
+    # "Jhd." / "Jhd" is by far the most common century abbreviation in the
+    # corpus (~186 occurrences) and was previously unrecognized.
+    ("16. Jhd.", (1501, 1600)),
+    ("18. Jhd.", (1701, 1800)),
+    ("Mitte 18. Jhd.", (1746, 1755)),
+    ("1. Hälfte 18. Jhd.", (1701, 1750)),
+    ("Anfang 13. Jhd.", (1201, 1215)),
+    ("Ende 17. Jhd.", (1686, 1700)),
+    ("letztes Drittel 16. Jhd", (1567, 1600)),
+    ("Kern aus dem 16. Jhd.", (1501, 1600)),
+])
+def test_jhd_century_abbreviation(text, expected):
+    assert unstruwwel(text, "de") == expected
+
+
+def test_jhd_matches_jahrhundert():
+    # The abbreviated and spelled-out forms must agree.
+    assert unstruwwel("19. Jhd.", "de") == unstruwwel("19. Jahrhundert", "de")
+
+
+@pytest.mark.parametrize("text, expected", [
+    # Each of these previously raised inside get_period; they must now parse
+    # safely. The remaining word tokens ("approximate"/"?") are flags, not
+    # interval parts.
+    ("um 1713/14 – um 1726", (1713, 1726)),  # abbreviated year + approx markers
+    ("1605/06 (?)", (1605, 1606)),           # trailing parenthesised "?"
+    ("Beginn 18. Jh.-ca. 1750", (1701, 1800)),  # century joined to a year
+])
+def test_safely_handles_previously_crashing_input(text, expected):
+    assert unstruwwel(text, "de") == expected
+
+
+def test_approximate_marker_sets_fuzzy_without_crashing():
+    x = unstruwwel("1605/06 (?)", "de", scheme="object")[0]
+    assert x.fuzzy == -1
+    assert x.time_span == (1605, 1606)
+
+
+def test_combined_early_late_centuries():
+    # "Ende12. Jhd./ Anfang 13. Jhd." -> late 12th through early 13th century.
+    assert unstruwwel("Ende12. Jhd./ Anfang 13. Jhd.", "de") == (1186, 1215)
+
+
+@pytest.mark.parametrize("text, expected", [
+    # Two centuries joined by a dash span the whole range. These previously
+    # crashed because the dash-split produced an empty leading sub-segment.
+    ("14. Jahrhundert - 17. Jahrhundert", (1301, 1700)),
+    ("16. Jhd. - 18. Jhd.", (1501, 1800)),
+])
+def test_century_range(text, expected):
+    assert unstruwwel(text, "de") == expected
+
+
+def test_out_of_range_year_degrades_to_none():
+    # A typo'd year (17685 > current year) must not raise; the malformed
+    # input simply yields no date instead of crashing.
+    assert unstruwwel("1677-17685", "de") == (None, None)
+
+
+def test_whole_corpus_parses_without_crashing():
+    # Regression guard: every verbal dating harvested from the real
+    # Deckenmalerei database must parse without raising an exception.
+    csv_path = pathlib.Path(__file__).parent / "verbal_dating.csv"
+    with csv_path.open(encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader)  # header
+        entries = sorted({row[0].strip() for row in reader if row and row[0].strip()})
+
+    failures = []
+    for entry in entries:
+        try:
+            unstruwwel(entry, "de")
+        except Exception as exc:  # noqa: BLE001 - we want to surface any crash
+            failures.append((entry, exc))
+
+    assert not failures, f"{len(failures)} entries crashed, e.g. {failures[:3]}"
