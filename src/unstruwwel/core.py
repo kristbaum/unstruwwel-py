@@ -201,8 +201,31 @@ def get_intervals(tokens, start, end):
     return get_year(y, negative, uncertain)
 
 
+def demote_range_prepositions(tokens) -> List[str]:
+    """Reinterpret a "before"/"after" that connects two dates as a range.
+
+    ``before`` and ``after`` open an unbounded interval only when they govern
+    the whole expression, e.g. ``"vor 1756"`` -> ``..1755``.  German ``bis``
+    ("until"), however, also standardizes to ``before`` and is far more often a
+    range connector: ``"1443 bis 1640"`` means 1443-1640, not "before 1640".
+
+    Whenever a date component (year, century or month) already precedes the
+    preposition it cannot be a leading bound, so it is demoted to a plain
+    ``"and"`` connector instead of leaving the interval open-ended.
+    """
+    result = list(tokens)
+    seen_date = False
+    for i, token in enumerate(result):
+        if token in ("before", "after"):
+            if seen_date:
+                result[i] = "and"
+        elif is_year(token) or token == "century" or token in MONTHS:
+            seen_date = True
+    return result
+
+
 def get_dates(tokens, scheme):
-    tokens = complete_additions(tokens)
+    tokens = demote_range_prepositions(complete_additions(tokens))
     n = len(tokens)
     marks = sorted(
         i for i in range(1, n + 1)
@@ -246,6 +269,7 @@ def unstruwwel(
     scheme: str = "time-span",
     fuzzify=(0, 0),
     verbose: bool = False,
+    mode: str = "safe",
 ):
     """Detect and parse historic dates.
 
@@ -258,6 +282,11 @@ def unstruwwel(
             (a list of :class:`~unstruwwel.periods.Periods`).
         fuzzify: Reserved for compatibility; currently unused.
         verbose: If ``True``, print the detected language.
+        mode: ``"safe"`` (default) only resolves inputs that denote a single
+            period; a compound entry listing several distinct datings (e.g.
+            ``"1184, 1750-1752"``) yields the empty result instead of a
+            misleading min-max span. ``"aggressive"`` resolves whatever it can,
+            collapsing every detected date into one enclosing span.
 
     Returns:
         The parsed result for a single string input, or a list of results
@@ -266,6 +295,9 @@ def unstruwwel(
     scheme = scheme.lower()
     if scheme not in ("iso-format", "time-span", "object"):
         raise ValueError(f"`{scheme}` is not a valid scheme")
+    mode = mode.lower()
+    if mode not in ("safe", "aggressive"):
+        raise ValueError(f"`{mode}` is not a valid mode")
     if len(fuzzify) != 2:
         raise ValueError("`fuzzify` must have length 2")
 
@@ -295,16 +327,32 @@ def unstruwwel(
     order = []
     for text in texts:
         if text not in unique:
-            unique[text] = _resolve(text, language, languages, scheme)
+            unique[text] = _resolve(text, language, languages, scheme, mode)
             order.append(text)
 
     results = [unique[text] for text in texts]
     return results[0] if scalar_input else results
 
 
-def _resolve(text, language, languages, scheme):
+def _empty(scheme):
+    return (None, None) if scheme == "time-span" else None
+
+
+def _has_date_mark(text: str) -> bool:
+    return any(is_year(t) or t == "century" for t in extract_groups(text))
+
+
+def _is_compound(standardized: str) -> bool:
+    """True if the text lists several distinct datings (comma/semicolon)."""
+    groups = re.split(r"[,;]", standardized)
+    return sum(1 for g in groups if _has_date_mark(g)) > 1
+
+
+def _resolve(text, language, languages, scheme, mode):
     standardized = text
     for name in language:
         standardized = languages[name].standardize(standardized)
+    if mode == "safe" and _is_compound(standardized):
+        return _empty(scheme)
     tokens = extract_groups(standardized)
     return get_dates(tokens, scheme)

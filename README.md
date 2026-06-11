@@ -40,6 +40,23 @@ per input.
 - `"object"` — a list of `Periods` objects, each exposing `.time_span`,
   `.iso_format`, `.interval`, `.fuzzy`, and `.express`.
 
+### Safe vs. aggressive mode
+
+Many real-world entries list several *distinct* datings rather than one period,
+e.g. `"1184, 1750-1752"` or `"1070-1129, 1672-1674, 1938-1940"`. Collapsing
+those into a single `(1184, 1752)` span is misleading, so the default
+`mode="safe"` declines to resolve a compound entry and returns the empty result
+instead:
+
+```python
+unstruwwel("1184, 1750-1752", "de")                       # (None, None)
+unstruwwel("1184, 1750-1752", "de", mode="aggressive")    # (1184, 1752)
+```
+
+A single period — including ranges like `"1750-1752"`, `"1443 bis 1640"`, or
+`"16. Jhd. - 18. Jhd."` — resolves under both modes. Use `mode="aggressive"`
+when you want a best-effort enclosing span for every entry.
+
 ### English-language examples
 
 ```python
@@ -77,7 +94,10 @@ unstruwwel("spätestens 1750er Jahre", "de", scheme="iso-format")
 
 A common use case is resolving a whole column of verbal datings, e.g. harvested
 from a museum or research database. Pass the column as an iterable and you get
-one result per row back, aligned with the input:
+one result per row back, aligned with the input. The snippet below reads a
+`verbaleDating` column, resolves it under both schemes, and writes a new CSV
+that places the original text next to its `start`/`end` years and ISO string
+for easy comparison:
 
 ```python
 import csv
@@ -88,27 +108,36 @@ with open("verbal_dating.csv", encoding="utf-8") as f:
 
 spans = unstruwwel(rows, "de")                       # [(start, end), ...]
 iso = unstruwwel(rows, "de", scheme="iso-format")    # ['1746-01-01/...', ...]
+
+with open("verbal_dating_resolved.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["verbaleDating", "start", "end", "iso"])
+    for text, (start, end), iso_str in zip(rows, spans, iso):
+        writer.writerow([text, start, end, iso_str])
 ```
 
-The examples below are real entries from the German *Deckenmalerei* database:
+For the real *Deckenmalerei* entries below, `verbal_dating_resolved.csv` then
+contains:
 
-| Input | `time-span` | `iso-format` |
-| --- | --- | --- |
-| `um 1750` | `(1750, 1750)` | `1750-01-01~/1750-12-31~` |
-| `16. Jhd.` | `(1501, 1600)` | `1501-01-01/1600-12-31` |
-| `1718-1722` | `(1718, 1722)` | `1718-01-01/1722-12-31` |
-| `1685-90` | `(1685, 1690)` | `1685-01-01/1690-12-31` |
-| `Mitte 18. Jhd.` | `(1746, 1755)` | `1746-01-01/1755-12-31` |
-| `1. Hälfte 18. Jhd.` | `(1701, 1750)` | `1701-01-01/1750-12-31` |
-| `14. Jahrhundert - 17. Jahrhundert` | `(1301, 1700)` | `1301-01-01/1700-12-31` |
-| `1685/1690` | `(1685, 1690)` | `1685-01-01/1690-12-31` |
-| `vor 1756` | `(-inf, 1755)` | `..1755-12-31` |
-| `nach 1679` | `(1680, inf)` | `1680-01-01..` |
-| `letztes Viertel des 17. Jahrhunderts` | `(1676, 1700)` | `1676-01-01/1700-12-31` |
-| `Ende 17. Jhd.` | `(1686, 1700)` | `1686-01-01/1700-12-31` |
+| verbaleDating | start | end | iso |
+| --- | --- | --- | --- |
+| `um 1750` | `1750` | `1750` | `1750-01-01~/1750-12-31~` |
+| `16. Jhd.` | `1501` | `1600` | `1501-01-01/1600-12-31` |
+| `1718-1722` | `1718` | `1722` | `1718-01-01/1722-12-31` |
+| `1685-90` | `1685` | `1690` | `1685-01-01/1690-12-31` |
+| `Mitte 18. Jhd.` | `1746` | `1755` | `1746-01-01/1755-12-31` |
+| `1. Hälfte 18. Jhd.` | `1701` | `1750` | `1701-01-01/1750-12-31` |
+| `14. Jahrhundert - 17. Jahrhundert` | `1301` | `1700` | `1301-01-01/1700-12-31` |
+| `1685/1690` | `1685` | `1690` | `1685-01-01/1690-12-31` |
+| `vor 1756` | `-inf` | `1755` | `..1755-12-31` |
+| `nach 1679` | `1680` | `inf` | `1680-01-01..` |
+| `letztes Viertel des 17. Jahrhunderts` | `1676` | `1700` | `1676-01-01/1700-12-31` |
+| `Ende 17. Jhd.` | `1686` | `1700` | `1686-01-01/1700-12-31` |
 
-Unparseable rows yield `(None, None)` (or `None` for `iso-format`) rather than
-raising, so a malformed entry never aborts a batch.
+Unparseable rows — and, under the default safe mode, compound entries that list
+several distinct datings — yield `(None, None)` (or `None` for `iso-format`)
+rather than raising, so a malformed entry never aborts a batch. Pass
+`mode="aggressive"` to also collapse compound entries into one enclosing span.
 
 ### Automatic language detection
 

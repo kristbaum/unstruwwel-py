@@ -209,7 +209,6 @@ def test_approximate_marker_survives_aggregation():
     ("1602-04", (1602, 1604)),       # abbreviated endpoint -> 1604
     ("1712-13", (1712, 1713)),
     ("1656/57", (1656, 1657)),       # slash form must agree with the dash form
-    ("1709-11, 19. Jahrhundert, 1982-85", (1709, 1985)),
 ])
 def test_year_range_with_dash(text, expected):
     assert unstruwwel(text, "de") == expected
@@ -244,6 +243,56 @@ def test_out_of_range_endpoint_is_dropped():
     assert unstruwwel("1677-17685", "de") == (1677, 1677)
 
 
+@pytest.mark.parametrize("text, expected", [
+    # German "bis" standardizes to "before" but is usually a range connector.
+    # When a date precedes it, it must not open an unbounded interval.
+    ("1443 bis 1640", (1443, 1640)),
+    ("1700 bis 1710", (1700, 1710)),
+    ("1778 bis 1779", (1778, 1779)),
+    # A leading preposition still opens the interval as before.
+    ("vor 1756", (-math.inf, 1755)),
+    ("bis 1696", (-math.inf, 1695)),
+    ("nach 1679", (1680, math.inf)),
+])
+def test_bis_is_a_range_unless_leading(text, expected):
+    assert unstruwwel(text, "de") == expected
+
+
+def test_month_range_with_bis_is_not_open_ended():
+    # Regression: "Juni bis September/Oktober 1751" previously yielded a
+    # spurious (-inf, 1751) because "bis" was read as "before".
+    assert unstruwwel("Juni bis September/Oktober 1751", "de") == (1751, 1751)
+
+
+@pytest.mark.parametrize("text", [
+    "1184, 1750-1752",
+    "1070-1129, 1672-1674, 1863-1882, 1938-1940",
+    "1709-11, 19. Jahrhundert, 1982-85",
+    "1664-1692; 1830-1850",
+])
+def test_safe_mode_refuses_compound_datings(text):
+    # Several distinct datings in one entry must not be flattened into a single
+    # misleading span under the default (safe) mode.
+    assert unstruwwel(text, "de") == (None, None)
+    assert unstruwwel(text, "de", scheme="iso-format") is None
+    # Aggressive mode still collapses them into one enclosing span.
+    assert unstruwwel(text, "de", mode="aggressive") != (None, None)
+
+
+def test_aggressive_mode_collapses_compound_span():
+    assert unstruwwel("1184, 1750-1752", "de", mode="aggressive") == (1184, 1752)
+
+
+def test_comma_within_single_date_still_resolves():
+    # A comma between day and year is not a compound list of datings.
+    assert unstruwwel("January 1, 1856", "en") == (1856, 1856)
+
+
+def test_invalid_mode():
+    with pytest.raises(ValueError):
+        unstruwwel("1842", "en", mode="nonsense")
+
+
 def test_whole_corpus_parses_without_crashing():
     # Regression guard: every verbal dating harvested from the real
     # Deckenmalerei database must parse without raising an exception.
@@ -255,9 +304,10 @@ def test_whole_corpus_parses_without_crashing():
 
     failures = []
     for entry in entries:
-        try:
-            unstruwwel(entry, "de")
-        except Exception as exc:  # noqa: BLE001 - we want to surface any crash
-            failures.append((entry, exc))
+        for mode in ("safe", "aggressive"):
+            try:
+                unstruwwel(entry, "de", mode=mode)
+            except Exception as exc:  # noqa: BLE001 - surface any crash
+                failures.append((mode, entry, exc))
 
     assert not failures, f"{len(failures)} entries crashed, e.g. {failures[:3]}"
