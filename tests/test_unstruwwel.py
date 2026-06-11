@@ -189,10 +189,38 @@ def test_safely_handles_previously_crashing_input(text, expected):
     assert unstruwwel(text, "de") == expected
 
 
-def test_approximate_marker_sets_fuzzy_without_crashing():
-    x = unstruwwel("1605/06 (?)", "de", scheme="object")[0]
-    assert x.fuzzy == -1
-    assert x.time_span == (1605, 1606)
+def test_approximate_marker_survives_aggregation():
+    # The trailing "(?)" marks the whole range approximate; the marker must
+    # carry through to the aggregated iso-format output.
+    assert unstruwwel("1605/06 (?)", "de") == (1605, 1606)
+    assert unstruwwel("1605/06 (?)", "de", scheme="iso-format") == (
+        "1605-01-01~/1606-12-31~"
+    )
+
+
+@pytest.mark.parametrize("text, expected", [
+    # Dash-separated year ranges. The dash standardizes to an "and" token,
+    # which previously broke both full-year ranges (only the last year was
+    # kept) and abbreviated endpoints (parsed as a stray 2-digit year).
+    ("1601-1602", (1601, 1602)),
+    ("1718-1722", (1718, 1722)),
+    ("1656-1657", (1656, 1657)),
+    ("1685-90", (1685, 1690)),       # abbreviated endpoint -> 1690
+    ("1602-04", (1602, 1604)),       # abbreviated endpoint -> 1604
+    ("1712-13", (1712, 1713)),
+    ("1656/57", (1656, 1657)),       # slash form must agree with the dash form
+    ("1709-11, 19. Jahrhundert, 1982-85", (1709, 1985)),
+])
+def test_year_range_with_dash(text, expected):
+    assert unstruwwel(text, "de") == expected
+
+
+def test_day_range_not_confused_with_year_addition():
+    # "15" here is a day introducing the second date, not a range endpoint of
+    # 1882, so it must not be completed to "1815".
+    x = unstruwwel("13. Juli 1882 - 15. Juli 1882", "de", scheme="object")
+    assert x[0].iso_format == "1882-07-13/1882-07-13"
+    assert x[1].iso_format == "1882-07-15/1882-07-15"
 
 
 def test_combined_early_late_centuries():
@@ -210,10 +238,10 @@ def test_century_range(text, expected):
     assert unstruwwel(text, "de") == expected
 
 
-def test_out_of_range_year_degrades_to_none():
-    # A typo'd year (17685 > current year) must not raise; the malformed
-    # input simply yields no date instead of crashing.
-    assert unstruwwel("1677-17685", "de") == (None, None)
+def test_out_of_range_endpoint_is_dropped():
+    # A typo'd endpoint (17685 > current year) must not raise; the invalid
+    # endpoint is dropped and the valid year is still recovered.
+    assert unstruwwel("1677-17685", "de") == (1677, 1677)
 
 
 def test_whole_corpus_parses_without_crashing():

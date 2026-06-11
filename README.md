@@ -73,6 +73,43 @@ unstruwwel("spätestens 1750er Jahre", "de", scheme="iso-format")
 # '..1749-12-31'
 ```
 
+### Processing a CSV column
+
+A common use case is resolving a whole column of verbal datings, e.g. harvested
+from a museum or research database. Pass the column as an iterable and you get
+one result per row back, aligned with the input:
+
+```python
+import csv
+from unstruwwel import unstruwwel
+
+with open("verbal_dating.csv", encoding="utf-8") as f:
+    rows = [row["verbaleDating"] for row in csv.DictReader(f)]
+
+spans = unstruwwel(rows, "de")                       # [(start, end), ...]
+iso = unstruwwel(rows, "de", scheme="iso-format")    # ['1746-01-01/...', ...]
+```
+
+The examples below are real entries from the German *Deckenmalerei* database:
+
+| Input | `time-span` | `iso-format` |
+| --- | --- | --- |
+| `um 1750` | `(1750, 1750)` | `1750-01-01~/1750-12-31~` |
+| `16. Jhd.` | `(1501, 1600)` | `1501-01-01/1600-12-31` |
+| `1718-1722` | `(1718, 1722)` | `1718-01-01/1722-12-31` |
+| `1685-90` | `(1685, 1690)` | `1685-01-01/1690-12-31` |
+| `Mitte 18. Jhd.` | `(1746, 1755)` | `1746-01-01/1755-12-31` |
+| `1. Hälfte 18. Jhd.` | `(1701, 1750)` | `1701-01-01/1750-12-31` |
+| `14. Jahrhundert - 17. Jahrhundert` | `(1301, 1700)` | `1301-01-01/1700-12-31` |
+| `1685/1690` | `(1685, 1690)` | `1685-01-01/1690-12-31` |
+| `vor 1756` | `(-inf, 1755)` | `..1755-12-31` |
+| `nach 1679` | `(1680, inf)` | `1680-01-01..` |
+| `letztes Viertel des 17. Jahrhunderts` | `(1676, 1700)` | `1676-01-01/1700-12-31` |
+| `Ende 17. Jhd.` | `(1686, 1700)` | `1686-01-01/1700-12-31` |
+
+Unparseable rows yield `(None, None)` (or `None` for `iso-format`) rather than
+raising, so a malformed entry never aborts a batch.
+
 ### Automatic language detection
 
 If `language` is omitted (or `None`), the language is detected from the input.

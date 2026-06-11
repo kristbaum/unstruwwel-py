@@ -8,7 +8,7 @@ import regex as re
 
 from .languages import load_languages
 from .guess import guess_language
-from .periods import Century, Decade, Periods, Year
+from .periods import MONTHS, Century, Decade, Periods, Year
 
 _TOKEN = re.compile(r"([0-9]+)|(\p{L}+)|(\?)")
 
@@ -36,6 +36,36 @@ def _at(tokens, pos):
 def extract_groups(text: str) -> List[str]:
     """Split standardized text into number / word / ``?`` tokens."""
     return [m.group(0) for m in _TOKEN.finditer(text)]
+
+
+def complete_additions(tokens) -> List[str]:
+    """Expand an abbreviated year-range endpoint into a full year.
+
+    A range such as ``1685-90`` standardizes to ``["1685", "and", "90"]`` and
+    ``1656/57`` to ``["1656", "57"]``; in both the trailing number is the
+    low-order part of a full year (1690, 1657).  This rewrites that endpoint to
+    its full form using the leading digits of the preceding year, so the rest
+    of the pipeline only ever sees complete years.
+
+    The short number must directly follow a four-digit year (optionally across
+    a single ``"and"``) and must not introduce a day/month group -- e.g. the
+    ``"15"`` in ``"... 1882 and 15 july 1882"`` is a day, not an addition.
+    """
+    result = list(tokens)
+    for i, token in enumerate(result):
+        if not is_year_addition(token):
+            continue
+        j = i - 1
+        if j >= 0 and result[j] == "and":
+            j -= 1  # step over the dash that became an "and"
+        if j < 0 or not is_year(result[j]):
+            continue
+        following = result[i + 1] if i + 1 < len(result) else None
+        if following in MONTHS:
+            continue
+        year = str(result[j])
+        result[i] = year[: len(year) - len(token)] + token
+    return result
 
 
 def _last_window(words) -> list:
@@ -172,6 +202,7 @@ def get_intervals(tokens, start, end):
 
 
 def get_dates(tokens, scheme):
+    tokens = complete_additions(tokens)
     n = len(tokens)
     marks = sorted(
         i for i in range(1, n + 1)
@@ -189,8 +220,6 @@ def get_dates(tokens, scheme):
             (m + 1 if (m + 1) in addition_positions else m) for m in marks
         ]
         markers = [m for m in markers if m < n]
-        if markers and markers[-1] == 1:
-            markers = [markers[0]]
 
         ends = markers[1:] + [n]
         segments = []
