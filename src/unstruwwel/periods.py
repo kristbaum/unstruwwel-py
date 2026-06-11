@@ -18,8 +18,18 @@ YEAR_ZERO = Date(0, 1, 1)
 _INFINITY_YEARS = 9999
 
 MONTHS = (
-    "january", "february", "march", "april", "may", "june",
-    "july", "august", "september", "october", "november", "december",
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
 )
 SEASONS = {
     "spring": [3, 4, 5],
@@ -76,11 +86,11 @@ class Periods:
     def interval(self) -> Interval:
         iv = self._interval.standardize()
         if self.express < 0:
-            iv = Interval(YEAR_ZERO.plus_years(-_INFINITY_YEARS),
-                          iv.start.plus_days(-1))
+            iv = Interval(
+                YEAR_ZERO.plus_years(-_INFINITY_YEARS), iv.start.plus_days(-1)
+            )
         elif self.express > 0:
-            iv = Interval(iv.end.plus_days(1),
-                          YEAR_ZERO.plus_years(_INFINITY_YEARS))
+            iv = Interval(iv.end.plus_days(1), YEAR_ZERO.plus_years(_INFINITY_YEARS))
         return iv
 
     @property

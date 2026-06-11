@@ -20,16 +20,13 @@ def guess_language(texts, verbose: bool = True) -> List[str]:
     nothing).  Languages with more than half the leader's points are returned.
     """
     languages = load_languages()
-    candidates = [
-        t for t in texts if t and _DIGIT.search(t) and _WORD.search(t)
-    ]
+    candidates = [t for t in texts if t and _DIGIT.search(t) and _WORD.search(t)]
 
     wins = {name: 0 for name in languages}
     for text in candidates:
         words = {w.lower() for w in _WORD.findall(text)}
         counts = {
-            name: len(words & lang.vocabulary)
-            for name, lang in languages.items()
+            name: len(words & lang.vocabulary) for name, lang in languages.items()
         }
         best = max(counts.values())
         if best == 0:
@@ -45,10 +42,7 @@ def guess_language(texts, verbose: bool = True) -> List[str]:
     detected = sorted(name for name, w in wins.items() if w > threshold)
 
     if verbose:
-        print(
-            "The following languages have been detected: "
-            f"{', '.join(detected)}."
-        )
+        print(f"The following languages have been detected: {', '.join(detected)}.")
     return detected
 
 
@@ -60,14 +54,11 @@ def guess_midas(texts, midas: bool = False, verbose: bool = True) -> bool:
 
     count_slash = sum(1 for t in texts if t and "/" in t) / n
     dashes = [chr(c) for c in range(0x2010, 0x2016)] + ["-"]
-    count_dash = sum(
-        1 for t in texts if t and any(d in t for d in dashes)
-    ) / n
+    count_dash = sum(1 for t in texts if t and any(d in t for d in dashes)) / n
 
     if count_dash - count_slash < -0.15 and not midas:
         if verbose:
             print(
-                "Please check if input vector might have been "
-                "standardized using MIDAS."
+                "Please check if input vector might have been standardized using MIDAS."
             )
     return midas
