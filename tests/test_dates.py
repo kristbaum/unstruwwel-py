@@ -7,9 +7,16 @@ import pytest
 from unstruwwel.dates import Date, Interval
 
 
-@pytest.mark.parametrize("year, month, day", [
-    (1970, 1, 1), (2000, 2, 29), (1, 1, 1), (1500, 12, 31), (2024, 6, 11),
-])
+@pytest.mark.parametrize(
+    "year, month, day",
+    [
+        (1970, 1, 1),
+        (2000, 2, 29),
+        (1, 1, 1),
+        (1500, 12, 31),
+        (2024, 6, 11),
+    ],
+)
 def test_ordinal_roundtrips_against_stdlib(year, month, day):
     d = Date(year, month, day)
     assert d.ordinal == datetime.date(year, month, day).toordinal() - 719163

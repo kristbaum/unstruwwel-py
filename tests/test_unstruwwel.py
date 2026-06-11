@@ -127,9 +127,10 @@ def test_trailing_zero():
 
 
 def test_combined_centuries():
-    assert unstruwwel(
-        "letztes Drittel 15. und 1. Hälfte 16. Jahrhundert", "de"
-    ) == (1467, 1550)
+    assert unstruwwel("letztes Drittel 15. und 1. Hälfte 16. Jahrhundert", "de") == (
+        1467,
+        1550,
+    )
 
 
 def test_duplicate_dates():
@@ -156,18 +157,22 @@ def test_list_input_returns_list():
 # These are verbal datings harvested from the Deckenmalerei research database.
 # They exercise patterns that the first port did not yet handle.
 
-@pytest.mark.parametrize("text, expected", [
-    # "Jhd." / "Jhd" is by far the most common century abbreviation in the
-    # corpus (~186 occurrences) and was previously unrecognized.
-    ("16. Jhd.", (1501, 1600)),
-    ("18. Jhd.", (1701, 1800)),
-    ("Mitte 18. Jhd.", (1746, 1755)),
-    ("1. Hälfte 18. Jhd.", (1701, 1750)),
-    ("Anfang 13. Jhd.", (1201, 1215)),
-    ("Ende 17. Jhd.", (1686, 1700)),
-    ("letztes Drittel 16. Jhd", (1567, 1600)),
-    ("Kern aus dem 16. Jhd.", (1501, 1600)),
-])
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # "Jhd." / "Jhd" is by far the most common century abbreviation in the
+        # corpus (~186 occurrences) and was previously unrecognized.
+        ("16. Jhd.", (1501, 1600)),
+        ("18. Jhd.", (1701, 1800)),
+        ("Mitte 18. Jhd.", (1746, 1755)),
+        ("1. Hälfte 18. Jhd.", (1701, 1750)),
+        ("Anfang 13. Jhd.", (1201, 1215)),
+        ("Ende 17. Jhd.", (1686, 1700)),
+        ("letztes Drittel 16. Jhd", (1567, 1600)),
+        ("Kern aus dem 16. Jhd.", (1501, 1600)),
+    ],
+)
 def test_jhd_century_abbreviation(text, expected):
     assert unstruwwel(text, "de") == expected
 
@@ -177,14 +182,17 @@ def test_jhd_matches_jahrhundert():
     assert unstruwwel("19. Jhd.", "de") == unstruwwel("19. Jahrhundert", "de")
 
 
-@pytest.mark.parametrize("text, expected", [
-    # Each of these previously raised inside get_period; they must now parse
-    # safely. The remaining word tokens ("approximate"/"?") are flags, not
-    # interval parts.
-    ("um 1713/14 – um 1726", (1713, 1726)),  # abbreviated year + approx markers
-    ("1605/06 (?)", (1605, 1606)),           # trailing parenthesised "?"
-    ("Beginn 18. Jh.-ca. 1750", (1701, 1800)),  # century joined to a year
-])
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # Each of these previously raised inside get_period; they must now parse
+        # safely. The remaining word tokens ("approximate"/"?") are flags, not
+        # interval parts.
+        ("um 1713/14 – um 1726", (1713, 1726)),  # abbreviated year + approx markers
+        ("1605/06 (?)", (1605, 1606)),  # trailing parenthesised "?"
+        ("Beginn 18. Jh.-ca. 1750", (1701, 1800)),  # century joined to a year
+    ],
+)
 def test_safely_handles_previously_crashing_input(text, expected):
     assert unstruwwel(text, "de") == expected
 
@@ -198,18 +206,21 @@ def test_approximate_marker_survives_aggregation():
     )
 
 
-@pytest.mark.parametrize("text, expected", [
-    # Dash-separated year ranges. The dash standardizes to an "and" token,
-    # which previously broke both full-year ranges (only the last year was
-    # kept) and abbreviated endpoints (parsed as a stray 2-digit year).
-    ("1601-1602", (1601, 1602)),
-    ("1718-1722", (1718, 1722)),
-    ("1656-1657", (1656, 1657)),
-    ("1685-90", (1685, 1690)),       # abbreviated endpoint -> 1690
-    ("1602-04", (1602, 1604)),       # abbreviated endpoint -> 1604
-    ("1712-13", (1712, 1713)),
-    ("1656/57", (1656, 1657)),       # slash form must agree with the dash form
-])
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # Dash-separated year ranges. The dash standardizes to an "and" token,
+        # which previously broke both full-year ranges (only the last year was
+        # kept) and abbreviated endpoints (parsed as a stray 2-digit year).
+        ("1601-1602", (1601, 1602)),
+        ("1718-1722", (1718, 1722)),
+        ("1656-1657", (1656, 1657)),
+        ("1685-90", (1685, 1690)),  # abbreviated endpoint -> 1690
+        ("1602-04", (1602, 1604)),  # abbreviated endpoint -> 1604
+        ("1712-13", (1712, 1713)),
+        ("1656/57", (1656, 1657)),  # slash form must agree with the dash form
+    ],
+)
 def test_year_range_with_dash(text, expected):
     assert unstruwwel(text, "de") == expected
 
@@ -227,12 +238,15 @@ def test_combined_early_late_centuries():
     assert unstruwwel("Ende12. Jhd./ Anfang 13. Jhd.", "de") == (1186, 1215)
 
 
-@pytest.mark.parametrize("text, expected", [
-    # Two centuries joined by a dash span the whole range. These previously
-    # crashed because the dash-split produced an empty leading sub-segment.
-    ("14. Jahrhundert - 17. Jahrhundert", (1301, 1700)),
-    ("16. Jhd. - 18. Jhd.", (1501, 1800)),
-])
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # Two centuries joined by a dash span the whole range. These previously
+        # crashed because the dash-split produced an empty leading sub-segment.
+        ("14. Jahrhundert - 17. Jahrhundert", (1301, 1700)),
+        ("16. Jhd. - 18. Jhd.", (1501, 1800)),
+    ],
+)
 def test_century_range(text, expected):
     assert unstruwwel(text, "de") == expected
 
@@ -243,17 +257,20 @@ def test_out_of_range_endpoint_is_dropped():
     assert unstruwwel("1677-17685", "de") == (1677, 1677)
 
 
-@pytest.mark.parametrize("text, expected", [
-    # German "bis" standardizes to "before" but is usually a range connector.
-    # When a date precedes it, it must not open an unbounded interval.
-    ("1443 bis 1640", (1443, 1640)),
-    ("1700 bis 1710", (1700, 1710)),
-    ("1778 bis 1779", (1778, 1779)),
-    # A leading preposition still opens the interval as before.
-    ("vor 1756", (-math.inf, 1755)),
-    ("bis 1696", (-math.inf, 1695)),
-    ("nach 1679", (1680, math.inf)),
-])
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # German "bis" standardizes to "before" but is usually a range connector.
+        # When a date precedes it, it must not open an unbounded interval.
+        ("1443 bis 1640", (1443, 1640)),
+        ("1700 bis 1710", (1700, 1710)),
+        ("1778 bis 1779", (1778, 1779)),
+        # A leading preposition still opens the interval as before.
+        ("vor 1756", (-math.inf, 1755)),
+        ("bis 1696", (-math.inf, 1695)),
+        ("nach 1679", (1680, math.inf)),
+    ],
+)
 def test_bis_is_a_range_unless_leading(text, expected):
     assert unstruwwel(text, "de") == expected
 
@@ -264,12 +281,15 @@ def test_month_range_with_bis_is_not_open_ended():
     assert unstruwwel("Juni bis September/Oktober 1751", "de") == (1751, 1751)
 
 
-@pytest.mark.parametrize("text", [
-    "1184, 1750-1752",
-    "1070-1129, 1672-1674, 1863-1882, 1938-1940",
-    "1709-11, 19. Jahrhundert, 1982-85",
-    "1664-1692; 1830-1850",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "1184, 1750-1752",
+        "1070-1129, 1672-1674, 1863-1882, 1938-1940",
+        "1709-11, 19. Jahrhundert, 1982-85",
+        "1664-1692; 1830-1850",
+    ],
+)
 def test_safe_mode_refuses_compound_datings(text):
     # Several distinct datings in one entry must not be flattened into a single
     # misleading span under the default (safe) mode.

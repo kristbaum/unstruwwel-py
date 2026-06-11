@@ -82,8 +82,7 @@ def build_century(words, negative, uncertain=False):
     ends = markers[1:] + [len(words)]
 
     centuries = [
-        get_century(words[markers[i]:ends[i]], negative)
-        for i in range(len(markers))
+        get_century(words[markers[i] : ends[i]], negative) for i in range(len(markers))
     ]
     centuries = [c for c in centuries if c is not None]
     if not centuries:
@@ -186,10 +185,10 @@ def get_intervals(tokens, start, end):
     if start > last_number:
         return None
 
-    y = [t for t in tokens[start - 1:last_number] if t != "?"]
+    y = [t for t in tokens[start - 1 : last_number] if t != "?"]
     next_char = min(max(numbers) + 1, n)
 
-    if "century" in tokens[start - 1:end]:
+    if "century" in tokens[start - 1 : end]:
         negative = _at(tokens, max(end + 1, n)) == "bc"
         return build_century(y, negative, uncertain)
     if _at(tokens, next_char) == "s":
@@ -228,7 +227,8 @@ def get_dates(tokens, scheme):
     tokens = demote_range_prepositions(complete_additions(tokens))
     n = len(tokens)
     marks = sorted(
-        i for i in range(1, n + 1)
+        i
+        for i in range(1, n + 1)
         if tokens[i - 1] == "century" or is_year(tokens[i - 1])
     )
 
@@ -239,9 +239,7 @@ def get_dates(tokens, scheme):
         addition_positions = [
             i for i in range(1, n + 1) if is_year_addition(tokens[i - 1])
         ]
-        markers = [0] + [
-            (m + 1 if (m + 1) in addition_positions else m) for m in marks
-        ]
+        markers = [0] + [(m + 1 if (m + 1) in addition_positions else m) for m in marks]
         markers = [m for m in markers if m < n]
 
         ends = markers[1:] + [n]
@@ -318,8 +316,7 @@ def unstruwwel(
     invalid = [name for name in language if name not in languages]
     if invalid:
         raise ValueError(
-            f"`{invalid[0]}` is either not defined in ISO 639-1 "
-            "or not yet implemented."
+            f"`{invalid[0]}` is either not defined in ISO 639-1 or not yet implemented."
         )
 
     # de-duplicate while preserving the mapping back to every input position
