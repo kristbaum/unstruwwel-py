@@ -1,29 +1,4 @@
-# Python
-*.py[cod]
-__pycache__/
-*.pyc
-
-# Virtual environments
-venv/
-.venv/
-env/
-env.bak/
-env1/
-env2/
-.env
-
-# IDEs and editors
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
-*.komodoproject
-.komodotools/
-.eclipse/
-.pydevproject
-.pycharm/
-*.bak
-*.swp
-*~
-.pytest_cache
-.ruff_cache
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata

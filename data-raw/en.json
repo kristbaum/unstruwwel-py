@@ -29,9 +29,6 @@
         "april",
         "apr"
     ],
-    "may": [
-        "may"
-    ],
     "june": [
         "june",
         "jun"
@@ -143,18 +140,6 @@
     ],
     "last": [
         "last"
-    ],
-    "early": [
-        "early"
-    ],
-    "mid": [
-        "mid"
-    ],
-    "late": [
-        "late"
-    ],
-    "s": [
-        "s"
     ],
     "end": [
         "end"
