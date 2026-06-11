@@ -167,7 +167,3 @@ adding another such file.
 ```bash
 uv run pytest
 ```
-
-## License
-
-GPL-3.0-or-later. See [LICENSE.md](LICENSE.md).
