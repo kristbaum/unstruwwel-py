@@ -1,6 +1,6 @@
 [project]
 name = "unstruwwel"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Detect and parse historic dates, e.g. to ISO 8601:2-2019."
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -21,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Text Processing :: Linguistic",
 ]
 dependencies = ["regex>=2023.0.0"]
@@ -36,6 +37,9 @@ dev = ["pytest>=7.0"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/unstruwwel/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/unstruwwel"]
