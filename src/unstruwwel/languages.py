@@ -52,12 +52,13 @@ class Language:
     replacements: list = field(default_factory=list)
     #: lowercased vocabulary, used for language detection
     vocabulary: set = field(default_factory=set)
-    _remove: "re.Pattern" = None
+    _remove: "re.Pattern | None" = None
 
     def standardize(self, text: str) -> str:
         if text is None:
             return ""
-        text = self._remove.sub("", text)
+        if self._remove is not None:
+            text = self._remove.sub("", text)
         text = " ".join(text.split())  # str_squish
         for pattern, after in self.replacements:
             text = pattern.sub(after, text)
@@ -97,7 +98,7 @@ def load_languages() -> dict:
     """Return a mapping of language code to :class:`Language` (cached)."""
     languages = {}
     data_dir = resources.files(__package__) / "data"
-    for entry in sorted(data_dir.iterdir()):
+    for entry in sorted(data_dir.iterdir(), key=lambda entry: entry.name):
         if entry.name.endswith(".json"):
             data = json.loads(entry.read_text(encoding="utf-8"))
             lang = _build_language(data)

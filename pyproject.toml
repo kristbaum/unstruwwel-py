@@ -6,10 +6,7 @@ readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE.md"]
 requires-python = ">=3.9"
-authors = [
-    { name = "Stefanie Schneider", email = "stefanie.schneider@itg.uni-muenchen.de" },
-    { name = "Kristbaum" },
-]
+authors = [{ name = "Kristbaum" }, { name = "Stefanie Schneider" }]
 keywords = ["dates", "iso-8601", "history", "parsing", "midas"]
 classifiers = [
     "Development Status :: 4 - Beta",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Sequence, Union
 
 import regex as re
 
@@ -263,7 +263,7 @@ def get_dates(tokens, scheme):
 
 def unstruwwel(
     x,
-    language: Optional[str] = None,
+    language: Optional[Union[str, Sequence[str]]] = None,
     scheme: str = "time-span",
     fuzzify=(0, 0),
     verbose: bool = False,
@@ -307,13 +307,13 @@ def unstruwwel(
 
     languages = load_languages()
     if language is None:
-        language = guess_language(texts, verbose=verbose)
+        language_codes = guess_language(texts, verbose=verbose)
     elif isinstance(language, str):
-        language = [language]
+        language_codes = [language]
     else:
-        language = list(language)
+        language_codes = list(language)
 
-    invalid = [name for name in language if name not in languages]
+    invalid = [name for name in language_codes if name not in languages]
     if invalid:
         raise ValueError(
             f"`{invalid[0]}` is either not defined in ISO 639-1 or not yet implemented."
@@ -324,7 +324,7 @@ def unstruwwel(
     order = []
     for text in texts:
         if text not in unique:
-            unique[text] = _resolve(text, language, languages, scheme, mode)
+            unique[text] = _resolve(text, language_codes, languages, scheme, mode)
             order.append(text)
 
     results = [unique[text] for text in texts]
