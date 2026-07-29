@@ -9,16 +9,16 @@ from .languages import load_languages
 from .periods import Century, Decade, Periods, Year
 
 __all__ = [
-    "unstruwwel",
+    "Century",
+    "Date",
+    "Decade",
+    "Interval",
+    "Periods",
+    "Year",
     "guess_language",
     "guess_midas",
     "load_languages",
-    "Periods",
-    "Century",
-    "Decade",
-    "Year",
-    "Date",
-    "Interval",
+    "unstruwwel",
 ]
 
 __version__ = "1.0.1"

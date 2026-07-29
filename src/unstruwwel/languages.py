@@ -52,7 +52,7 @@ class Language:
     replacements: list = field(default_factory=list)
     #: lowercased vocabulary, used for language detection
     vocabulary: set = field(default_factory=set)
-    _remove: "re.Pattern | None" = None
+    _remove: re.Pattern | None = None
 
     def standardize(self, text: str) -> str:
         if text is None:

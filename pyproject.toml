@@ -43,3 +43,9 @@ packages = ["src/unstruwwel"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=0.16.0",
+]

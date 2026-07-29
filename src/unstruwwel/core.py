@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import List, Optional, Union
 
 import regex as re
 
-from .languages import load_languages
 from .guess import guess_language
+from .languages import load_languages
 from .periods import MONTHS, Century, Decade, Periods, Year
 
 _TOKEN = re.compile(r"([0-9]+)|(\p{L}+)|(\?)")

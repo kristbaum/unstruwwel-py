@@ -57,33 +57,33 @@ class Date:
     day: int
 
     @classmethod
-    def ymd(cls, year: int, month: int = 1, day: int = 1) -> "Date":
+    def ymd(cls, year: int, month: int = 1, day: int = 1) -> Date:
         return cls(year, month, day)
 
     @classmethod
-    def from_ordinal(cls, ordinal: int) -> "Date":
+    def from_ordinal(cls, ordinal: int) -> Date:
         return cls(*_from_ordinal(ordinal))
 
     @property
     def ordinal(self) -> int:
         return _to_ordinal(self.year, self.month, self.day)
 
-    def plus_years(self, n: int) -> "Date":
+    def plus_years(self, n: int) -> Date:
         year = self.year + n
         day = min(self.day, _days_in_month(year, self.month))
         return Date(year, self.month, day)
 
-    def plus_months(self, n: int) -> "Date":
+    def plus_months(self, n: int) -> Date:
         total = (self.year * 12 + (self.month - 1)) + n
         year, month = divmod(total, 12)
         month += 1
         day = min(self.day, _days_in_month(year, month))
         return Date(year, month, day)
 
-    def plus_days(self, n: int) -> "Date":
+    def plus_days(self, n: int) -> Date:
         return Date.from_ordinal(self.ordinal + n)
 
-    def with_day(self, day: int) -> "Date":
+    def with_day(self, day: int) -> Date:
         return Date(self.year, self.month, day)
 
     def iso(self) -> str:
@@ -100,10 +100,10 @@ class Interval:
     end: Date
 
     @classmethod
-    def of(cls, a: Date, b: Date) -> "Interval":
+    def of(cls, a: Date, b: Date) -> Interval:
         return cls(a, b)
 
-    def standardize(self) -> "Interval":
+    def standardize(self) -> Interval:
         """Return a copy with ``start <= end``."""
         if self.start.ordinal > self.end.ordinal:
             return Interval(self.end, self.start)

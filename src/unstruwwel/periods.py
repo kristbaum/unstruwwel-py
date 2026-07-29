@@ -118,7 +118,7 @@ class Periods:
         return "/".join(parts)
 
     # -- specification -------------------------------------------------------
-    def set_additions(self, tokens) -> "Periods":
+    def set_additions(self, tokens) -> Periods:
         tokens = list(tokens)
         if any(t in ("approximate", "?") for t in tokens):
             self.fuzzy = -1
@@ -130,7 +130,7 @@ class Periods:
             self.express = 1
         return self
 
-    def take(self, x=None, type=None, ignore_errors=False) -> "Periods":
+    def take(self, x=None, type=None, ignore_errors=False) -> Periods:
         try:
             if isinstance(x, (list, tuple)) and len(x) == 2:
                 x, type = x[0], x[1]
@@ -276,7 +276,7 @@ class Year(Periods):
         iv = Interval(start, start.plus_years(1).plus_days(-1))
         self._interval = iv.standardize()
 
-    def take(self, x=None, type=None, ignore_errors=False) -> "Periods":
+    def take(self, x=None, type=None, ignore_errors=False) -> Periods:
         try:
             if isinstance(x, (list, tuple)) and len(x) == 2:
                 x, type = x[0], x[1]
