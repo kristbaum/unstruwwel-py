@@ -10,11 +10,11 @@ def neg(date, years):
 
 
 def test_invalid_century():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid century"):
         Century(22)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not an integer"):
         Century(20.22)
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError, match="not a scalar integer"):
         Century([10, 20])
 
 
@@ -93,15 +93,15 @@ def test_negative_century_with_take():
 
 
 def test_invalid_take_with_errors():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Century(15).take(999)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid type"):
         Century(15).take(type="abc")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Century(15).take(3, type="half")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Century(15).take(4, type="third")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Century(15).take(5, type="quarter")
 
 

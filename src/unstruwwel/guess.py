@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List
-
 import regex as re
 
 from .languages import load_languages
@@ -12,7 +10,7 @@ _WORD = re.compile(r"\p{L}{3,}")  # at least three letters
 _DIGIT = re.compile(r"[0-9]")
 
 
-def guess_language(texts, verbose: bool = True) -> List[str]:
+def guess_language(texts, verbose: bool = True) -> list[str]:
     """Detect the dominant language(s) of ``texts``.
 
     For every entry that mixes letters and digits, the language whose
@@ -56,9 +54,6 @@ def guess_midas(texts, midas: bool = False, verbose: bool = True) -> bool:
     dashes = [chr(c) for c in range(0x2010, 0x2016)] + ["-"]
     count_dash = sum(1 for t in texts if t and any(d in t for d in dashes)) / n
 
-    if count_dash - count_slash < -0.15 and not midas:
-        if verbose:
-            print(
-                "Please check if input vector might have been standardized using MIDAS."
-            )
+    if count_dash - count_slash < -0.15 and not midas and verbose:
+        print("Please check if input vector might have been standardized using MIDAS.")
     return midas

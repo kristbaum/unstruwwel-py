@@ -10,14 +10,14 @@ def neg(date, years):
 
 
 def test_invalid_year():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not an integer"):
         Year(197.5)
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError, match="not a scalar integer"):
         Year([197, 198])
 
 
 def test_invalid_take_with_year():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid month or season"):
         Year(1900).take(type="j")
 
 

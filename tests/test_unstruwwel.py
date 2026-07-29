@@ -9,12 +9,12 @@ from unstruwwel import unstruwwel
 
 def test_no_language():
     # "1460" has no letters, so the language cannot be detected
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="Language could not be detected"):
         unstruwwel("1460", scheme="object")
 
 
 def test_invalid_language():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not yet implemented"):
         unstruwwel("1460", "bo", scheme="object")
 
 

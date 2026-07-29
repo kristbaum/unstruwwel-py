@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import List, Optional, Union
 
 import regex as re
 
@@ -34,12 +33,12 @@ def _at(tokens, pos):
     return None
 
 
-def extract_groups(text: str) -> List[str]:
+def extract_groups(text: str) -> list[str]:
     """Split standardized text into number / word / ``?`` tokens."""
     return [m.group(0) for m in _TOKEN.finditer(text)]
 
 
-def complete_additions(tokens) -> List[str]:
+def complete_additions(tokens) -> list[str]:
     """Expand an abbreviated year-range endpoint into a full year.
 
     A range such as ``1685-90`` standardizes to ``["1685", "and", "90"]`` and
@@ -201,7 +200,7 @@ def get_intervals(tokens, start, end):
     return get_year(y, negative, uncertain)
 
 
-def demote_range_prepositions(tokens) -> List[str]:
+def demote_range_prepositions(tokens) -> list[str]:
     """Reinterpret a "before"/"after" that connects two dates as a range.
 
     ``before`` and ``after`` open an unbounded interval only when they govern
@@ -264,7 +263,7 @@ def get_dates(tokens, scheme):
 
 def unstruwwel(
     x,
-    language: Optional[Union[str, Sequence[str]]] = None,
+    language: str | Sequence[str] | None = None,
     scheme: str = "time-span",
     fuzzify=(0, 0),
     verbose: bool = False,

@@ -10,13 +10,13 @@ def neg(date, years):
 
 
 def test_invalid_decade():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid decade"):
         Decade(203)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid decade"):
         Decade(2021)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not an integer"):
         Decade(197.5)
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError, match="not a scalar integer"):
         Decade([197, 198])
 
 
@@ -79,15 +79,15 @@ def test_negative_decade_with_take():
 
 
 def test_invalid_take_with_errors():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Decade(1970).take(99)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="not a valid type"):
         Decade(1970).take(type="abc")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Decade(1970).take(3, type="half")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Decade(1970).take(4, type="third")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="out of range"):
         Decade(1970).take(5, type="quarter")
 
 

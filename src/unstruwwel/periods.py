@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import datetime
 import math
-from typing import Optional
 
 from .dates import Date, Interval
 
@@ -37,10 +36,12 @@ SEASONS = {
     "autumn": [9, 10, 11],
     "winter": [12, 13, 14],
 }
+#: Parts a :meth:`Periods.take` can narrow down to; ``None`` means an equal tenth.
+TAKE_TYPES = ("early", "mid", "late", "half", "third", "quarter")
 
 
 def current_year() -> int:
-    return datetime.date.today().year
+    return datetime.datetime.now().astimezone().year
 
 
 def _is_negative(interval: Interval) -> bool:
@@ -50,7 +51,7 @@ def _is_negative(interval: Interval) -> bool:
 class Periods:
     """A time period delimited by an interval, with fuzzy/express flags."""
 
-    def __init__(self, interval: Optional[Interval] = None, parts=None):
+    def __init__(self, interval: Interval | None = None, parts=None):
         #: ``-1`` approximate, ``1`` uncertain, ``0`` exact.
         self.fuzzy = 0
         #: ``-1`` before, ``1`` after, ``0`` neither.
@@ -136,6 +137,8 @@ class Periods:
                 x, type = x[0], x[1]
             if x is not None and x != "last" and x != "first":
                 x = _as_numeric(x)
+            if type is not None and str(type).lower() not in TAKE_TYPES:
+                raise ValueError(f"`{type}` is not a valid type")
             type = str(type).lower()
 
             if type == "early":
@@ -328,7 +331,7 @@ def _as_integer(value) -> int:
             raise ValueError(f"`{value}` is not an integer")
         value = int(value)
     if not isinstance(value, int):
-        raise ValueError(f"`{value}` is not a scalar integer")
+        raise TypeError(f"`{value}` is not a scalar integer")
     return value
 
 
