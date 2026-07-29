@@ -294,7 +294,7 @@ class Year(Periods):
             else:
                 raise ValueError(f"`{type}` is not a valid month or season")
 
-            iv = self._take_period(x, months)
+            iv = self._take_months(x, months)
             result = Periods(interval=iv)
             result.fuzzy = self.fuzzy
             result.express = self.express
@@ -304,7 +304,8 @@ class Year(Periods):
                 return self
             raise
 
-    def _take_period(self, value, months) -> Interval:
+    def _take_months(self, value, months) -> Interval:
+        """Narrow to ``months`` of this year, optionally to a single day."""
         start = self._interval.standardize().start
         lower = start.plus_months(min(months) - 1)
         upper = start.plus_months(max(months)).plus_days(-1)

@@ -97,7 +97,7 @@ def _build_language(data: dict) -> Language:
 def load_languages() -> dict:
     """Return a mapping of language code to :class:`Language` (cached)."""
     languages = {}
-    data_dir = resources.files(__package__) / "data"
+    data_dir = resources.files(__package__ or __name__) / "data"
     for entry in sorted(data_dir.iterdir(), key=lambda entry: entry.name):
         if entry.name.endswith(".json"):
             data = json.loads(entry.read_text(encoding="utf-8"))

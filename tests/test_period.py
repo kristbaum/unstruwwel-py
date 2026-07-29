@@ -7,12 +7,13 @@ from unstruwwel.dates import Date, Interval
 def test_read_only_properties():
     x = Periods(interval=Interval(Date(1750, 1, 1), Date(1750, 12, 31)))
 
+    # the assignments below are invalid on purpose - that is what is asserted
     with pytest.raises(AttributeError):
-        x.interval = Interval(Date(1760, 1, 1), Date(1760, 12, 31))
+        x.interval = Interval(Date(1760, 1, 1), Date(1760, 12, 31))  # ty: ignore[invalid-assignment]
     with pytest.raises(AttributeError):
-        x.iso_format = "1760-01-01?/1760-12-31?"
+        x.iso_format = "1760-01-01?/1760-12-31?"  # ty: ignore[invalid-assignment]
     with pytest.raises(AttributeError):
-        x.time_span = (1760, 1760)
+        x.time_span = (1760, 1760)  # ty: ignore[invalid-assignment]
 
 
 def test_combines_parts_into_spanning_interval():

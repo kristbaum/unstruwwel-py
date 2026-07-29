@@ -299,8 +299,12 @@ def unstruwwel(
     if len(fuzzify) != 2:
         raise ValueError("`fuzzify` must have length 2")
 
-    scalar_input = isinstance(x, str) or x is None
-    values = [x] if scalar_input else list(x)
+    if isinstance(x, str) or x is None:
+        scalar_input = True
+        values = [x]
+    else:
+        scalar_input = False
+        values = list(x)
     if not values:
         raise ValueError("`x` must not be empty")
     texts = ["" if v is None else str(v) for v in values]
